@@ -17,7 +17,7 @@ def get_positions(robot: IRobot):
             doc_file.write('Position\tType\tJoints\n')
 
     while conditions:
-        choice = input('Digite o nome da posição ou Q(q) para sair do programa:\n')
+        choice = input('Nome da posição ou Q(q) para sair do programa:\n')
         if choice.upper() == "Q":
             conditions = False
         else:
@@ -28,7 +28,7 @@ def get_positions(robot: IRobot):
             print(f'CART: {cart_pos}')
             with open(doc_name, 'a+') as doc_file_:
                 doc_file_.write(f'{choice}\tjoints\t{joint_pos}')
-                doc_file_.write(f'{choice}\cartesian\t{cart_pos}')
+                doc_file_.write(f'{choice}\tcartesian\t{cart_pos}')
 
 
 def robot_choice() -> IRobot:

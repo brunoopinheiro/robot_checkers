@@ -1,6 +1,4 @@
 from robots.irobot import IRobot
-from robots.pose import Pose
-from robots.joint import Joint
 
 
 class RobotController:
