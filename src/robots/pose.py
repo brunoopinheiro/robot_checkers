@@ -21,5 +21,17 @@ class Pose:
         self.yaw = self.yaw + other.yaw
         return self
 
+    @property
     def to_dict(self) -> dict[str, float]:
         return self.__dict__
+
+    @property
+    def to_list(self) -> list[float]:
+        return [
+            self.x,
+            self.y,
+            self.z,
+            self.roll,
+            self.pitch,
+            self.yaw,
+        ]
