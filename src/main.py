@@ -36,8 +36,8 @@ def get_positions(robot: IRobot):
 def update_bank(robotcontroller: RobotController) -> None:
     _stop = False
     robotcontroller.connect()
-    robotcontroller._to_custom_coords('home')
-    robotcontroller.to_home()
+    # robotcontroller._to_custom_coords('home')
+    # robotcontroller.to_home()
     while not _stop:
         choice = input('Dict Key or "EXIT" to quit.: ')
         if choice.upper() == "EXIT":
