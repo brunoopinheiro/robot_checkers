@@ -61,6 +61,23 @@ class RobotController:
         )
         self.robot.joint_move(upperboardjoints)
 
+    def _move_z(self, z: float) -> None:
+        basepose = self.robot.pose
+        basepose.z = z
+        self.robot.cartesian_move(basepose)
+
+    def _move_x_y(self, x: float, y: float) -> None:
+        basepose = self.robot.pose
+        basepose.x = x
+        basepose.y = y
+        self.robot.cartesian_move(basepose)
+
+    def _movejoint(self, joint: int, degrees: float) -> None:
+        basejoint_dict = self.robot.joint.to_dict
+        basejoint_dict[f'j{joint}'] = degrees
+        joint_ = Joint(**basejoint_dict)
+        self.robot.joint_move(joint_)
+
     def get_positions(self) -> tuple[Joint, Pose]:
         self.robot.get_joints()
         self.robot.get_cartesian()
