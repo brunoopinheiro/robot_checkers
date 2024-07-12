@@ -57,7 +57,6 @@ class IRobot(AbstractRobot):
         self.__pose = None
         self.__joint = None
         self.__fault = False
-        print('Robô Kinova ligado e esperando conexão.')
 
     def connect(self) -> None:
         self.__connected = True
@@ -79,13 +78,13 @@ class IRobot(AbstractRobot):
 
     @check_connection
     @check_faultstate
-    def open_tool(self, actuation_time: float = 2) -> bool:
+    def open_tool(self, actuation_time: float = 1) -> bool:
         if self.grip_closed:
             self.__gripclosed = False
 
     @check_connection
     @check_faultstate
-    def close_tool(self, actuation_time: float = 2) -> bool:
+    def close_tool(self, actuation_time: float = 1) -> bool:
         if not self.grip_closed:
             self.__gripclosed = True
 
