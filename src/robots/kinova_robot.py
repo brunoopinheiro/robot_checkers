@@ -23,6 +23,7 @@ class KinovaRobot(IRobot):
             ip_address=KinovaRobot.IP,
             robot_type=RobotEnum.GEN3_LITE,
         )
+        print('Robô Kinova ligado e esperando conexão.')
 
     def connect(self) -> None:
         print('KINOVA: Estabelecendo Conexão')
@@ -58,14 +59,14 @@ class KinovaRobot(IRobot):
 
     @check_connection
     @check_faultstate
-    def open_tool(self, actuation_time: float = 2) -> bool:
+    def open_tool(self, actuation_time: float = 1) -> bool:
         print('Abrindo Garra')
         self.kinova.open_gripper(actuation_time)
         super().open_tool(actuation_time)
 
     @check_connection
     @check_faultstate
-    def close_tool(self, actuation_time: float = 2) -> bool:
+    def close_tool(self, actuation_time: float = 1) -> bool:
         print('Fechando Garra')
         self.kinova.close_gripper(actuation_time)
         super().close_tool(actuation_time)
