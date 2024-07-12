@@ -1,7 +1,9 @@
 from robots.irobot import IRobot
 from robots.kinova_robot import KinovaRobot
-# add the robot controller
+from robots.test_robot import TestRobot
+from controller.robot_controller import RobotController
 from utils.emergency_stop import EmergencyStop
+from movebank.movebank import MoveBank
 
 
 def get_positions(robot: IRobot):
@@ -31,19 +33,88 @@ def get_positions(robot: IRobot):
                 doc_file_.write(f'{choice}\tcartesian\t{cart_pos}')
 
 
+def update_bank(robotcontroller: RobotController) -> None:
+    _stop = False
+    robotcontroller.connect()
+    robotcontroller._to_custom_coords('home')
+    robotcontroller.to_home()
+    while not _stop:
+        choice = input('Dict Key or "EXIT" to quit.: ')
+        if choice.upper() == "EXIT":
+            _stop = True
+        else:
+            robotcontroller.record_position(
+                pos_key=choice
+            )
+    robotcontroller.disconnect()
+
+
+def test_positions(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    _stop = False
+    print('Test Bank: "bank_key;[C|J]"')
+    print('Type "EXIT" to leave.')
+    while not _stop:
+        try:
+            pos = input('>> ')
+            if pos.upper() == "EXIT":
+                _stop = True
+            else:
+                key, movetype = pos.split(';')
+                if movetype.upper() == 'C':
+                    robotcontroller._to_custom_coords(key)
+                else:
+                    robotcontroller._to_custom_pose(key)
+        except Exception as e:
+            print('Error: ', e)
+    robotcontroller.disconnect()
+
+
 def robot_choice() -> IRobot:
-    kinova = KinovaRobot()
-    return kinova
+    print('== Choose a Robot ==')
+    print('[1] - Kinova')
+    print('[2] - Test')
+    robotchoice = None
+    robot = None
+    while robotchoice not in [1, 2]:
+        try:
+            robotchoice = int(input('>> '))
+        except TypeError:
+            print('Invalid Robot Type')
+    if robotchoice == 1:
+        robot = KinovaRobot()
+    if robotchoice == 2:
+        robot = TestRobot()
+    return robot
 
 
 def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
-    # add the robot controller
+
+    # Might become a choice if positions are not compatible
+    movebank = MoveBank()
+    controller = RobotController(
+        robot=robot,
+        movebank=movebank,
+    )
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
-    # THIS WILL BECOME A MENU LATER ON
-    get_positions(robot)
+
+    print('== Robot Operation ==')
+    print('[1] - Test Positions')
+    print('[2] - Get Positions')
+    menuchoice = None
+    while menuchoice not in [1, 2]:
+        try:
+            menuchoice = int(input('>> '))
+        except TypeError as err:
+            print('Invalid Choice ', err)
+        if menuchoice == 1:
+            test_positions(controller)
+        if menuchoice == 2:
+            update_bank(controller)
+        exit()
 
 
 if __name__ == '__main__':
