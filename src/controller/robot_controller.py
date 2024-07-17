@@ -5,7 +5,9 @@ from movebank.movebank import MoveBank
 from enum import Enum
 
 
-UPPER_MOVEMENT_HEIGHT = 'upper_movement_height'
+MIDDLE_MOVE_HEIGHT = 'middle_move_height'
+UPPER_MOVE_HEIGHT = 'upper_movement_height'
+UPPER_DROP = 'upper_drop_height'
 
 
 class _RoboStates(Enum):
@@ -56,13 +58,23 @@ class RobotController:
         """Moves the robot to the Home pose via joints"""
         homejoints = self.move_map.get_joints(_RoboStates.HOME.value)
         self.robot.joint_move(homejoints)
+        self.robot.open_tool()
 
     def to_upperboard(self) -> None:
         """Moves the robot to the Upper Board pose via joints"""
         upperboardjoints = self.move_map.get_joints(
             key=_RoboStates.UPPER_BOARD.value,
         )
+        print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
+
+    def check_valid_keys(self, *args) -> bool:
+        try:
+            for key in args:
+                self.move_map.get_cartesian(key)
+            return True
+        except KeyError:
+            return False
 
     def _move_z(self, z: float) -> None:
         basepose = self.robot.pose
@@ -106,22 +118,78 @@ class RobotController:
 
     def _to_upper_move(self, target: str) -> float:
         target_pose = self.move_map.get_cartesian(target)
-        upper_move_pose = self.move_map.get_cartesian(UPPER_MOVEMENT_HEIGHT)
+        upper_move_pose = self.move_map.get_cartesian(MIDDLE_MOVE_HEIGHT)
         z = upper_move_pose.z
         target_pose.z = z
         self.robot.cartesian_move(target_pose)
         return z
 
+    def drop_piece(self) -> None:
+        print('Movendo peça para a caixa.')
+        self._to_custom_pose(UPPER_MOVE_HEIGHT)
+        self._to_custom_pose(UPPER_DROP)
+        self.robot.open_tool(2)
+        self.to_upperboard()
+
     def capture_piece(self, origin: str, targets: list[str]) -> None:
+        for tgt in targets:
+            self.move_map.get_cartesian(tgt)
+        self.robot.close_tool(1)
+        print('Iniciando Captura de Peças')
+        print(f'Origem: {origin}')
+        self.to_upperboard()
         z = self._to_upper_move(origin)
         origin_coord = self.move_map.get_cartesian(origin)
         self.robot.cartesian_move(origin_coord)
         self.robot.close_tool(actuation_time=0.5)
-        self._move_z(z)
         for tgt in targets:
+            self._move_z(z)
+            print(f'Alvo: {tgt}')
             self._to_upper_move(tgt)
             tgt_coord = self.move_map.get_cartesian(tgt)
             self.robot.cartesian_move(tgt_coord)
         self.robot.open_tool(actuation_time=0.5)
         self._move_z(z)
+        self.to_upperboard()
+        self.robot.open_tool()
+
+    def remove_piece_from_board(self, piece_location: str) -> None:
+        print(f'Removendo Peça {piece_location} do tabuleiro.')
+        self.robot.close_tool(1)
+        self.to_upperboard()
+        z = self._to_upper_move(piece_location)
+        target_pose = self.move_map.get_cartesian(piece_location)
+        self.robot.cartesian_move(target_pose)
+        self.robot.close_tool(actuation_time=0.5)
+        self._move_z(z)
+        self.drop_piece()
+
+    def _get_queen(self, queen: str) -> None:
+        print(f'Buscando {queen}')
+        self.robot.close_tool(1)
+        self.to_upperboard()
+        self._to_custom_pose(f'{queen}_pregrip')
+        self._to_custom_coords(queen)
+        self.robot.close_tool(0.5)
+        print('Peça capturada')
+        self._to_custom_pose(UPPER_MOVE_HEIGHT)
+
+    def place_queen(
+            self,
+            target_location: str,
+            queen: int,
+    ) -> None:
+        q_key = f'dama{queen}'
+        self._get_queen(q_key)
+        target = self.move_map.get_cartesian(target_location)
+        self._move_x_y(
+            x=target.x,
+            y=target.y,
+        )
+        self.robot.cartesian_move(target)
+        self.robot.open_tool(0.5)
+        print('Dama colocada')
+        self._to_upper_move(
+            target=UPPER_MOVE_HEIGHT,
+        )
         self.to_upperboard()

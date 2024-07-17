@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from waitress import serve
 
 
-from controllers.home_controller import home_controller
+from api.controllers.home_controller import home_controller
 
 
 app = Flask(__name__)

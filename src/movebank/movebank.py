@@ -54,7 +54,7 @@ class MoveBank:
             pose = Pose(*float_list)
             return pose
         else:
-            raise KeyError('key not in MoveBank')
+            raise KeyError(f'key {key} not in MoveBank')
 
     def get_joints(self, key: str) -> Joint:
         if key in self.__bankdict:
@@ -63,7 +63,7 @@ class MoveBank:
             joint = Joint(*float_list)
             return joint
         else:
-            raise KeyError('key not in MoveBank')
+            raise KeyError(f'key {key} not in MoveBank')
 
     def _record_positions(
         self,
