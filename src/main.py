@@ -114,7 +114,9 @@ def main():
             test_positions(controller)
         if menuchoice == 2:
             update_bank(controller)
-        exit()
+        else:
+            emergency_stop.stop_thread()
+            exit()
 
 
 if __name__ == '__main__':
