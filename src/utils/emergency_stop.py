@@ -4,6 +4,9 @@ from robots.irobot import IRobot
 
 
 class EmergencyStop:
+    """EmergencyStop class to add the option
+    to apply a fault to the Kinova Robot in
+    operation via terminal."""
 
     def __init__(
         self,

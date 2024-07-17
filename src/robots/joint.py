@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Joint:
+    """Representes a robot joint pose, with its values
+    from j1 to j6 in float values."""
 
     j1: float
     j2: float
