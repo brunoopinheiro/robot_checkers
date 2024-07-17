@@ -1,6 +1,13 @@
 from json import load, dumps
 from robots.pose import Pose
 from robots.joint import Joint
+from enum import Enum
+
+
+class RobotTableEnum(Enum):
+
+    KINOVA = '_r1'
+    KANOVA = '_r2'
 
 
 class MoveBank:
@@ -15,9 +22,13 @@ class MoveBank:
                 cls).__new__(cls)
         return cls.__instance
 
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            robot_table: RobotTableEnum = RobotTableEnum.KINOVA,
+    ) -> None:
         bankdict = self.__load_bank()
         self.__bankdict = bankdict
+        self.__tablekey = robot_table.value
 
     def __load_bank(self) -> dict[str, dict[str, list[float]]]:
         with open(MoveBank.filepath, 'r') as file:
@@ -35,13 +46,15 @@ class MoveBank:
         return [float(v) for v in values]
 
     def get_cartesian(self, key: str) -> Pose:
+        if len(key) == 2:
+            key = f'{key}{self.__tablekey}'
         if key in self.__bankdict:
             str_list = self.__bankdict[key]['cartesian']
             float_list = self.__str_to_floatlist(str_list)
             pose = Pose(*float_list)
             return pose
         else:
-            raise KeyError('key not in MoveBank')
+            raise KeyError(f'key {key} not in MoveBank')
 
     def get_joints(self, key: str) -> Joint:
         if key in self.__bankdict:
@@ -50,7 +63,7 @@ class MoveBank:
             joint = Joint(*float_list)
             return joint
         else:
-            raise KeyError('key not in MoveBank')
+            raise KeyError(f'key {key} not in MoveBank')
 
     def _record_positions(
         self,
