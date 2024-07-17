@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Pose:
+    """Represents a robot pose with its
+    x, y, z, roll, pitch and yaw values."""
 
     x: float
     y: float

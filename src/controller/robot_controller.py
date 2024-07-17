@@ -69,6 +69,8 @@ class RobotController:
         self.robot.joint_move(upperboardjoints)
 
     def check_valid_keys(self, *args) -> bool:
+        """Receives a variable number of map keys and checks
+        if they all are valid keys."""
         try:
             for key in args:
                 self.move_map.get_cartesian(key)
@@ -77,23 +79,29 @@ class RobotController:
             return False
 
     def _move_z(self, z: float) -> None:
+        """Moves the robot cartesianly only in the Z axis."""
         basepose = self.robot.pose
         basepose.z = z
         self.robot.cartesian_move(basepose)
 
     def _move_x_y(self, x: float, y: float) -> None:
+        """Moves the robot cartesianly only in the X and Y axis."""
         basepose = self.robot.pose
         basepose.x = x
         basepose.y = y
         self.robot.cartesian_move(basepose)
 
     def _movejoint(self, joint: int, degrees: float) -> None:
+        """Moves the robot by joints reference."""
         basejoint_dict = self.robot.joint.to_dict
         basejoint_dict[f'j{joint}'] = degrees
         joint_ = Joint(**basejoint_dict)
         self.robot.joint_move(joint_)
 
     def get_positions(self) -> tuple[Joint, Pose]:
+        """Gets the actual robot pose and returns
+        a tuple with its joints and cartesian references
+        as `Joint` and `Pose` objects."""
         self.robot.get_joints()
         self.robot.get_cartesian()
         joints = self.robot.joint
@@ -101,6 +109,8 @@ class RobotController:
         return (joints, pose)
 
     def record_position(self, pos_key: str) -> None:
+        """Uses the `MoveMap` object instance to
+        update the `.json` file with the movement keys."""
         joints, pose = self.get_positions()
         self.move_map._record_positions(
             pos_key=pos_key,
@@ -109,14 +119,21 @@ class RobotController:
         )
 
     def _to_custom_pose(self, jointskey: str) -> None:
+        """Moves the robot by joints reference to a custom
+        position."""
         custompose = self.move_map.get_joints(jointskey)
         self.robot.joint_move(custompose)
 
     def _to_custom_coords(self, posekey: str) -> None:
+        """Moves the robot by coordinates reference to
+        a custom position."""
         custompose = self.move_map.get_cartesian(posekey)
         self.robot.cartesian_move(custompose)
 
     def _to_upper_move(self, target: str) -> float:
+        """Moves the robot to the X and Y axis of a given
+        target key, maintaining the Z axis from the
+        `middle_movement_height` key."""
         target_pose = self.move_map.get_cartesian(target)
         upper_move_pose = self.move_map.get_cartesian(MIDDLE_MOVE_HEIGHT)
         z = upper_move_pose.z
@@ -125,6 +142,8 @@ class RobotController:
         return z
 
     def drop_piece(self) -> None:
+        """Drops a piece in the drop box assuming the robot
+        already has the piece grasped."""
         print('Movendo peça para a caixa.')
         self._to_custom_pose(UPPER_MOVE_HEIGHT)
         self._to_custom_pose(UPPER_DROP)
@@ -132,6 +151,8 @@ class RobotController:
         self.to_upperboard()
 
     def capture_piece(self, origin: str, targets: list[str]) -> None:
+        """Captures a variable number of pieces, from an origin point.
+        This function does not remove pieces from the game board."""
         for tgt in targets:
             self.move_map.get_cartesian(tgt)
         self.robot.close_tool(1)
@@ -154,6 +175,7 @@ class RobotController:
         self.robot.open_tool()
 
     def remove_piece_from_board(self, piece_location: str) -> None:
+        """Removes a piece from the board, based on its key location."""
         print(f'Removendo Peça {piece_location} do tabuleiro.')
         self.robot.close_tool(1)
         self.to_upperboard()
@@ -165,6 +187,8 @@ class RobotController:
         self.drop_piece()
 
     def _get_queen(self, queen: str) -> None:
+        """Retrieves a queen and returns to the
+        `upper_movement_height` position"""
         print(f'Buscando {queen}')
         self.robot.close_tool(1)
         self.to_upperboard()
@@ -179,6 +203,8 @@ class RobotController:
             target_location: str,
             queen: int,
     ) -> None:
+        """Retrieves a queen and places in a target
+        location key."""
         q_key = f'dama{queen}'
         self._get_queen(q_key)
         target = self.move_map.get_cartesian(target_location)

@@ -4,6 +4,8 @@ from robots.joint import Joint
 
 
 class AbstractRobot(ABC):
+    """Abstract robot class that
+    represents a robot."""
 
     @abstractmethod
     def connect(self) -> None:

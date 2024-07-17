@@ -9,6 +9,8 @@ from robots.joint import Joint
 
 
 class TestRobot(IRobot):
+    """TestRobot class. Only simullates the movements
+    via prints and updates its internal reference."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -79,5 +81,6 @@ class TestRobot(IRobot):
 
     @check_connection
     def _clear_fault(self) -> bool:
+        """Not Implemented"""
         self.fault_state = False
         print('Limpeza de Falta bem sucedida.')
