@@ -5,6 +5,9 @@ from movebank.movebank import MoveBank
 from enum import Enum
 
 
+UPPER_MOVEMENT_HEIGHT = 'upper_movement_height'
+
+
 class _RoboStates(Enum):
     UNDEFINED = 'undefined'
     HOME = 'home'
@@ -100,3 +103,25 @@ class RobotController:
     def _to_custom_coords(self, posekey: str) -> None:
         custompose = self.move_map.get_cartesian(posekey)
         self.robot.cartesian_move(custompose)
+
+    def _to_upper_move(self, target: str) -> float:
+        target_pose = self.move_map.get_cartesian(target)
+        upper_move_pose = self.move_map.get_cartesian(UPPER_MOVEMENT_HEIGHT)
+        z = upper_move_pose.z
+        target_pose.z = z
+        self.robot.cartesian_move(target_pose)
+        return z
+
+    def capture_piece(self, origin: str, targets: list[str]) -> None:
+        z = self._to_upper_move(origin)
+        origin_coord = self.move_map.get_cartesian(origin)
+        self.robot.cartesian_move(origin_coord)
+        self.robot.close_tool(actuation_time=0.5)
+        self._move_z(z)
+        for tgt in targets:
+            self._to_upper_move(tgt)
+            tgt_coord = self.move_map.get_cartesian(tgt)
+            self.robot.cartesian_move(tgt_coord)
+        self.robot.open_tool(actuation_time=0.5)
+        self._move_z(z)
+        self.to_upperboard()

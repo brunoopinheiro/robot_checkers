@@ -88,6 +88,40 @@ def robot_choice() -> IRobot:
     return robot
 
 
+def capture_pieces(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    try:
+        print('Informe a posição de captura, e as posições de movimento.')
+        print('Ex.: A1;C3;E5')
+        print('Ou digite "EXIT" para sair.')
+        _stop = False
+        while not _stop:
+            pos_str = input('>> ')
+            if pos_str.upper() == 'EXIT':
+                _stop = True
+            else:
+                pos_list = pos_str.lower().split(';')
+                print(pos_list)
+                if len(pos_list) > 1:
+                    robotcontroller.capture_piece(
+                        origin=pos_list[0],
+                        targets=pos_list[1:]
+                    )
+                else:
+                    print('Informe ao menos 2 posições separadas por ;')
+                    print('Ex.: A1;C3')
+    except Exception as e:
+        print('Error: ', e)
+    robotcontroller.disconnect()
+
+
+def __print_menu() -> None:
+    print('== Robot Operation ==')
+    print('[1] - Test Positions')
+    print('[2] - Get Positions')
+    print('[3] - Capture Pieces')
+
+
 def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
@@ -101,9 +135,7 @@ def main():
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
 
-    print('== Robot Operation ==')
-    print('[1] - Test Positions')
-    print('[2] - Get Positions')
+    __print_menu()
     menuchoice = None
     while menuchoice not in [1, 2]:
         try:
@@ -114,9 +146,12 @@ def main():
             test_positions(controller)
         if menuchoice == 2:
             update_bank(controller)
+        if menuchoice == 3:
+            capture_pieces(controller)
         else:
             emergency_stop.stop_thread()
             exit()
+        __print_menu()
 
 
 if __name__ == '__main__':
