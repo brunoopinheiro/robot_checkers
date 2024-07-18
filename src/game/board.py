@@ -69,3 +69,10 @@ class Board:
         newb_col, newb_row = self.get_square(n_col, n_row)
         self.__board[board_col][board_row].content = None
         self.__board[newb_col][newb_row].content = piece
+
+    def is_empty(self, coords: Coordinates) -> bool:
+        col, row = coords
+        c, r = self.get_square(col, row)
+        if self.__board[c][r].content is None:
+            return True
+        return False
