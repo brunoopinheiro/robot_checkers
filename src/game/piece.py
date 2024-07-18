@@ -32,15 +32,24 @@ class Piece(ABC):
         """The actual piece coordinates."""
         return self.__coordinates
 
-    @abstractmethod
     def move(self, new_coordinate: Coordinates) -> None:
         """Updates the piece coordinates given a new
         coordinate reference."""
-        raise NotImplementedError
+        self.__coordinates = new_coordinate
+
+    def __str__(self) -> str:
+        piece = f'{self.color} {type(self).__name__} {self.icon}'
+        coord = f'{self.coordinates}'
+        return f'{piece} {coord}'
 
     @property
     @abstractmethod
     def move_length(self) -> int:
         """Returns how many squares the piece can move
         in a normal movement."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def jump_length(self) -> int:
         raise NotImplementedError
