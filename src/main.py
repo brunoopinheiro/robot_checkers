@@ -36,8 +36,6 @@ def get_positions(robot: IRobot):
 def update_bank(robotcontroller: RobotController) -> None:
     _stop = False
     robotcontroller.connect()
-    # robotcontroller._to_custom_coords('home')
-    # robotcontroller.to_home()
     while not _stop:
         choice = input('Dict Key or "EXIT" to quit.: ')
         if choice.upper() == "EXIT":
@@ -88,6 +86,89 @@ def robot_choice() -> IRobot:
     return robot
 
 
+def capture_pieces(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    print('Informe a posição de captura, e as posições de movimento.')
+    print('Ex.: A1;C3;E5')
+    print('Ou digite "EXIT" para sair.')
+    _stop = False
+    while not _stop:
+        pos_str = input('>> ')
+        if pos_str.upper() == 'EXIT':
+            _stop = True
+        else:
+            try:
+                pos_list = pos_str.lower().split(';')
+                print(pos_list)
+                valid = robotcontroller.check_valid_keys(*pos_list)
+                if valid is False:
+                    print('Apenas posições das casas brancas são válidas.')
+                elif len(pos_list) > 1 and valid is True:
+                    robotcontroller.capture_piece(
+                        origin=pos_list[0],
+                        targets=pos_list[1:]
+                    )
+                else:
+                    print('Informe ao menos 2 posições separadas por ;')
+                    print('Ex.: A1;C3')
+            except Exception as e:
+                print('Error: ', e)
+    robotcontroller.disconnect()
+
+
+def remove_pieces(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    print('Informe a posição da peça a ser removida.')
+    print('Ex.: E5')
+    print('Digite "EXIT" para sair.')
+    _stop = False
+    while not _stop:
+        pos = input('>> ')
+        if pos.upper() == 'EXIT':
+            _stop = True
+        else:
+            try:
+                robotcontroller.remove_piece_from_board(
+                    piece_location=pos,
+                )
+            except KeyError as err:
+                print(err)
+    robotcontroller.disconnect()
+
+
+def place_queen(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    _stop = False
+    while not _stop:
+        print('Informe a posição de colocação da Dama')
+        print('EX.: E1')
+        print('Digite "EXIT" para sair.')
+        pos = input('>> ')
+        if pos.upper() == 'EXIT':
+            _stop = True
+        else:
+            try:
+                print('Informe a Rainha a ser colocada.')
+                rnum = int(input('>> '))
+                robotcontroller.place_queen(
+                    target_location=pos,
+                    queen=rnum,
+                )
+            except KeyError as err:
+                print(err)
+    robotcontroller.disconnect()
+
+
+def __print_menu() -> None:
+    print('== Robot Operation ==')
+    print('[1] - Test Positions')
+    print('[2] - Get Positions')
+    print('[3] - Capture Pieces')
+    print('[4] - Remove Piece')
+    print('[5] - Place Queen')
+    print('[0] - EXIT')
+
+
 def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
@@ -101,20 +182,29 @@ def main():
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
 
-    print('== Robot Operation ==')
-    print('[1] - Test Positions')
-    print('[2] - Get Positions')
+    __print_menu()
+    _stop = False
     menuchoice = None
-    while menuchoice not in [1, 2]:
+    while not _stop:
         try:
             menuchoice = int(input('>> '))
         except TypeError as err:
             print('Invalid Choice ', err)
+        if menuchoice == 0:
+            emergency_stop.stop_thread()
+            _stop = True
         if menuchoice == 1:
             test_positions(controller)
         if menuchoice == 2:
             update_bank(controller)
-        exit()
+        if menuchoice == 3:
+            capture_pieces(controller)
+        if menuchoice == 4:
+            remove_pieces(controller)
+        if menuchoice == 5:
+            place_queen(controller)
+        else:
+            __print_menu()
 
 
 if __name__ == '__main__':

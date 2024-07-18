@@ -10,6 +10,9 @@ from rria_api.robot_enum import RobotEnum
 
 
 class KinovaRobot(IRobot):
+    """Class that connects with the real Kinova Robot.
+    Keeps a reference of the robot state to validate its
+    action requests."""
 
     IP = '192.168.2.10'
 

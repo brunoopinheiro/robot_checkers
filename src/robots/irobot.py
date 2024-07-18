@@ -4,6 +4,9 @@ from robots.joint import Joint
 
 
 def check_connection(func):
+    """`Decorator` that checks if the
+    robot is `connected` and prevents
+    it from acting when not connected."""
     def wrapper(self, *args, **kwargs):
         if self.connected:
             return func(self, *args, **kwargs)
@@ -13,6 +16,9 @@ def check_connection(func):
 
 
 def check_faultstate(func):
+    """`Decorator` that checks it the
+    robot is in fault state, and prevents
+    it from moving when in fault state."""
     def wrapper(self, *args, **kwargs):
         if self.fault_state:
             raise SystemError('The robot is in fault state.')
@@ -22,6 +28,10 @@ def check_faultstate(func):
 
 
 class IRobot(AbstractRobot):
+    """Robot Interface that implements
+    some of the robot logic that is
+    common to either the `TestRobot`
+    and the `KinovaRobot`."""
 
     @property
     def connected(self) -> bool:
