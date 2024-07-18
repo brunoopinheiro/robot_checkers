@@ -13,12 +13,13 @@ def crop_center(pil_img, crop_width, crop_height):
 def crop_max_square(pil_img):
     return crop_center(pil_img, min(pil_img.size), min(pil_img.size))
 
-path_origin = "C:/Users/jlc/Documents/Fabrica de Software 1 e 2/Projeto Damas/[Dataset] - Checkers-20240712T112016Z-001/[Dataset] - Checkers/Extracted_Frames_[DATASET]_Checkers"
+path_origin = 'src/visao/extracted_frames'
 
-path_save = "C:/Users/jlc/Documents/Fabrica de Software 1 e 2/Projeto Damas/[Dataset] - Checkers-20240712T112016Z-001/[Dataset] - Checkers/Cropped_Images_[DATASET]_Checkers"
-
+path_save = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/cropped_pictures"
 for img in os.listdir(path_origin):
     img_obj = Image.open(f"{path_origin}/{img}")
     img_obj_cropped = crop_max_square(img_obj)
-    img_obj_cropped.save(f"{path_save}/{img}_cropped.jpg")
-    
+    print(f'Saving cropped picture {img}_cropped.jpg at path {path_save}...')
+    img_obj_cropped.save(f"{path_save}/{img}")
+
+print('DONE!')

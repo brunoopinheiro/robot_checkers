@@ -1,29 +1,26 @@
 import cv2
 import os
-import time
+
+cwd = os.getcwd()
+
+
+path = 'src/visao/video'
+path_video = (os.path.join(path, (os.listdir(path)[0]))).replace('\\', '/')
+
+
+path_images = 'src/visao/extracted_frames'
 
 
 
-
-path_video = 'C:/Users/jlc/Documents/Fabrica de Software 1 e 2/Projeto Damas/[Dataset] - Checkers-20240712T112016Z-001/[Dataset] - Checkers/pictures/WIN_20240711_15_50_56_Pro.mp4'
-
-path_images = 'C:/Users/jlc/Documents/Fabrica de Software 1 e 2/Projeto Damas/[Dataset] - Checkers-20240712T112016Z-001/[Dataset] - Checkers/pictures'
-
-video_capture = cv2.VideoCapture(path_video)
-
-os.chdir('C:/Users/jlc/Documents/Fabrica de Software 1 e 2/Projeto Damas/[Dataset] - Checkers-20240712T112016Z-001/[Dataset] - Checkers/pictures')
-f = 0
+captured_video = cv2.VideoCapture(path_video)
+count = 0
 i = 1
-while(video_capture.isOpened()):
-    ret, frame = video_capture.read()
-    if ret:
+success = True
+while success:
+    success,image = captured_video.read()
+    if count%15 == 0 :
+            print(f'Processing frame {i} - sucessso: {success}')
+            cv2.imwrite(os.path.join(path_images, f'picture{i}.jpg'), image)
+            i += 1
+    count += 1
     
-        cv2.imwrite(path_images+f'{i}.jpg'.format(f), frame)
-        video_capture.set(1, f)
-        i += 1
-        f += 30
-    else:
-        video_capture.release()
-        break
-
-
