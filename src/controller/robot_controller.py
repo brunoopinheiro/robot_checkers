@@ -155,9 +155,9 @@ class RobotController:
         This function does not remove pieces from the game board."""
         for tgt in targets:
             self.move_map.get_cartesian(tgt)
-        self.robot.close_tool(1)
         print('Iniciando Captura de Peças')
         print(f'Origem: {origin}')
+        self.robot.close_tool(1)
         self.to_upperboard()
         z = self._to_upper_move(origin)
         origin_coord = self.move_map.get_cartesian(origin)
@@ -196,7 +196,8 @@ class RobotController:
         self._to_custom_coords(queen)
         self.robot.close_tool(0.5)
         print('Peça capturada')
-        self._to_custom_pose(UPPER_MOVE_HEIGHT)
+        # subir Z
+        self._to_custom_pose('pregrip_height')
 
     def place_queen(
             self,
@@ -219,3 +220,4 @@ class RobotController:
             target=UPPER_MOVE_HEIGHT,
         )
         self.to_upperboard()
+        self.robot.open_tool()
