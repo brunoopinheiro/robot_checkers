@@ -1,9 +1,13 @@
+# Esse script não foi implementado com orientação a objeto,
+# pois será encapsulado pelo Flask na próxima etapa do projeto.
+
+
 from robots.irobot import IRobot
 from robots.kinova_robot import KinovaRobot
 from robots.test_robot import TestRobot
 from controller.robot_controller import RobotController
 from utils.emergency_stop import EmergencyStop
-from movebank.movebank import MoveBank
+from movebank.movebank import MoveBank, RobotTableEnum
 
 
 def get_positions(robot: IRobot):
@@ -86,6 +90,24 @@ def robot_choice() -> IRobot:
     return robot
 
 
+def bank_choice() -> MoveBank:
+    print('== Choose a Robot Table ==')
+    print('[1] - Kinova')
+    print('[2] - KAnova')
+    movechoice = None
+    movebank = None
+    while movechoice not in [1, 2]:
+        try:
+            movechoice = int(input('>> '))
+        except TypeError:
+            print('Invalid Movement Bank')
+        if movechoice == 1:
+            movebank = MoveBank(RobotTableEnum.KINOVA)
+        if movechoice == 2:
+            movebank = MoveBank(RobotTableEnum.KANOVA)
+    return movebank
+
+
 def capture_pieces(robotcontroller: RobotController) -> None:
     robotcontroller.connect()
     print('Informe a posição de captura, e as posições de movimento.')
@@ -159,6 +181,13 @@ def place_queen(robotcontroller: RobotController) -> None:
     robotcontroller.disconnect()
 
 
+def dataset_capture_position(robotcontroller: RobotController) -> None:
+    robotcontroller.connect()
+    robotcontroller.to_upperboard()
+    input('Pressione qualquer tecla para continuar.')
+    robotcontroller.disconnect()
+
+
 def __print_menu() -> None:
     print('== Robot Operation ==')
     print('[1] - Test Positions')
@@ -166,15 +195,15 @@ def __print_menu() -> None:
     print('[3] - Capture Pieces')
     print('[4] - Remove Piece')
     print('[5] - Place Queen')
+    print('[6] - Dataset Capture Pose')
     print('[0] - EXIT')
 
 
 def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
+    movebank = bank_choice()
 
-    # Might become a choice if positions are not compatible
-    movebank = MoveBank()
     controller = RobotController(
         robot=robot,
         movebank=movebank,
@@ -203,6 +232,8 @@ def main():
             remove_pieces(controller)
         if menuchoice == 5:
             place_queen(controller)
+        if menuchoice == 6:
+            dataset_capture_position(controller)
         else:
             __print_menu()
 
