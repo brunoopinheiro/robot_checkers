@@ -81,6 +81,19 @@ O programa fará a instância dos robôs, banco de movimentos e controlador do r
 
 > Na versão atual, o controlador do robô executará a conexão e se desconectará em cada uma das opções do menu. Em versões futuras, a conexão será mantida durante a execução do programa.
 
+Na seleção de casas no tabuleiro, a notação `LetraNumero` assume que as letras de `A` a `H` representam as colunas, e os números de `1` a `8` representam as linhas. A posição se inicia em `A1` sendo a casa branca mais à esquerda, próximo ao robô, e a posição `H8` sendo a casa branca mais à direita, mais distante do robô.
+
+|   | H | G | F | E | D | C | B | A |
+|---|---|---|---|---|---|---|---|---|
+| 1 |   | g1 |   | e1 |   | c1 |   | a1 |
+| 2 | h2 |   | f2 |   | d2 |   | b2 |   |
+| 3 |   | g3 |   | e3 |   | c3 |   | a3 |
+| 4 | h4 |   | f4 |   | d4 |   | b4 |   |
+| 5 |   | g5 |   | e5 |   | c5 |   | a5 |
+| 6 | h6 |   | f6 |   | d6 |   | b6 |   |
+| 7 |   | g7 |   | e7 |   | c7 |   | a7 |
+| 8 | h8 |   | f8 |   | d8 |   | b8 |   |
+
 ![Menu de Escolha do Robô](docs/images/robot_menu.png)
 
 ### Movimentar Peças [Opção 3]
