@@ -19,6 +19,11 @@ def main():
         destiny=Coordinates('g', 5)
     )
     game.board_state()
+    result = game.move_piece(
+        origin=Coordinates('e', 3),
+        destiny=Coordinates('c', 5)
+    )
+    print(result)
 
 
 if __name__ == '__main__':

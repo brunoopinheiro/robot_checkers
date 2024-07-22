@@ -2,6 +2,13 @@ from __future__ import annotations
 from board import Board
 from piece import Coordinates, Piece
 from pawn import Pawn
+from enum import Enum
+
+
+class MovementTypes(Enum):
+
+    MOVE = 1
+    JUMP = 2
 
 
 class Checkers:
@@ -11,6 +18,8 @@ class Checkers:
     # "🟢" for Green pieces
 
     __instance = None
+    __colmap: dict[str, int] = {val: idx
+                                for idx, val in enumerate(Board.columns)}
 
     def __new__(cls, *args, **kwargs) -> Checkers:
         if Checkers.__instance is None:
@@ -68,12 +77,33 @@ class Checkers:
                 self.p2_pieces.append(pp1)
                 self.p2_pieces.append(pp2)
 
+    def __distance(self, origin: Coordinates, destiny: Coordinates) -> int:
+        o_col, o_row = origin
+        d_col, d_row = destiny
+        a: tuple[int, int] = (Checkers.__colmap[o_col], o_row)
+        b: tuple[int, int] = (Checkers.__colmap[d_col], d_row)
+        print(a, b)
+        c = (abs(a[0] - b[0]), abs(a[1] - b[1]))
+        return max(c)
+
     def _place_piece(
             self,
             piece: Piece,
             old_coords: Coordinates,
     ) -> None:
         self.__board.place_piece(piece, piece.coordinates, old_coords)
+
+    def _check_valid_move(
+            self,
+            piece: Piece,
+            destiny: Coordinates,
+    ) -> bool:
+        try:
+            if self.__distance(piece.coordinates, destiny) > piece.move_length:
+                return False
+            return True
+        except IndexError as err:
+            print(err)
 
     def start_game(self) -> None:
         self.__initial_pieces()
@@ -99,5 +129,7 @@ class Checkers:
         if not self.__board.is_empty(destiny):
             return False
         piece = self.get_piece_by_coord(origin)
+        if self._check_valid_move(piece, destiny) is False:
+            return False
         piece.move(destiny)
         self._place_piece(piece, origin)
