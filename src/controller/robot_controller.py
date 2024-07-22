@@ -8,6 +8,8 @@ from enum import Enum
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
 UPPER_MOVE_HEIGHT = 'upper_movement_height'
 UPPER_DROP = 'upper_drop_height'
+QUEEN_STEP1 = 'queen_placement_middle'
+QUEEN_STEP2 = 'queen_placement_row8'
 
 
 class _RoboStates(Enum):
@@ -196,8 +198,9 @@ class RobotController:
         self._to_custom_coords(queen)
         self.robot.close_tool(0.5)
         print('Peça capturada')
-        # subir Z
-        self._to_custom_pose('pregrip_height')
+        self._move_z(0.05)
+        self._to_custom_pose(QUEEN_STEP1)
+        self._to_custom_coords(QUEEN_STEP1)
 
     def place_queen(
             self,
@@ -216,8 +219,7 @@ class RobotController:
         self.robot.cartesian_move(target)
         self.robot.open_tool(0.5)
         print('Dama colocada')
-        self._to_upper_move(
-            target=UPPER_MOVE_HEIGHT,
-        )
+        self._move_z(0.1)
+        self._to_custom_pose(QUEEN_STEP2)
         self.to_upperboard()
         self.robot.open_tool()
