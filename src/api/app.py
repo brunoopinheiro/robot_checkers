@@ -2,13 +2,14 @@ from flask import Flask, render_template
 from waitress import serve
 
 
-from controllers.home_controller import home_controller
+from controllers.home_controller import home_controller, game_controller
 
 
 app = Flask(__name__)
 app.static_folder = 'views/static'
 app.template_folder = 'views/template'
 app.register_blueprint(home_controller, url_prefix='/')
+app.register_blueprint(game_controller, url_prefix='/game')
 
 
 @app.errorhandler(404)
