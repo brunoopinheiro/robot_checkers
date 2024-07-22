@@ -183,8 +183,7 @@ def place_queen(robotcontroller: RobotController) -> None:
 
 def dataset_capture_position(robotcontroller: RobotController) -> None:
     robotcontroller.connect()
-    robotcontroller.to_upperboard()
-    input('Pressione qualquer tecla para continuar.')
+    robotcontroller.dataset_capture_position()
     robotcontroller.disconnect()
 
 

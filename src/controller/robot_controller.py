@@ -3,6 +3,7 @@ from robots.pose import Pose
 from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
+from capture.cam import Capture
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
@@ -43,6 +44,7 @@ class RobotController:
         self.__robot = robot
         self.__movemap = movebank
         self.__state: _RoboStates = _RoboStates.UNDEFINED
+        self.__cam = Capture()
 
     def connect(self) -> None:
         """Stablishes the robot connection"""
@@ -221,3 +223,9 @@ class RobotController:
         )
         self.to_upperboard()
         self.robot.open_tool()
+
+    def dataset_capture_position(self) -> None:
+        self.to_home()
+        self.to_upperboard()
+        self.__cam.capture_image()
+
