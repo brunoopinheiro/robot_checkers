@@ -21,7 +21,7 @@ def main():
     game.board_state()
     result = game.move_piece(
         origin=Coordinates('e', 3),
-        destiny=Coordinates('c', 5)
+        destiny=Coordinates('h', 9)
     )
     print(result)
 

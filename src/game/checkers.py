@@ -5,6 +5,9 @@ from pawn import Pawn
 from enum import Enum
 
 
+OUT_OF_BOUNDS = "You've tried to go out of the board."
+
+
 class MovementTypes(Enum):
 
     MOVE = 1
@@ -102,8 +105,22 @@ class Checkers:
             if self.__distance(piece.coordinates, destiny) > piece.move_length:
                 return False
             return True
-        except IndexError as err:
-            print(err)
+        except KeyError:
+            print(OUT_OF_BOUNDS)
+            return False
+
+    def _check_valid_jump(
+            self,
+            piece: Piece,
+            destiny: Coordinates,
+    ) -> bool:
+        try:
+            if self.__distance(piece.coordinates, destiny) > piece.jump_length:
+                return False
+            return True
+        except KeyError:
+            print(OUT_OF_BOUNDS)
+            return False
 
     def start_game(self) -> None:
         self.__initial_pieces()
@@ -124,12 +141,31 @@ class Checkers:
         return None
 
     def move_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
-        if self.__board.is_empty(origin):
+        try:
+            if self.__board.is_empty(origin):
+                return False
+            if not self.__board.is_empty(destiny):
+                return False
+            piece = self.get_piece_by_coord(origin)
+            if self._check_valid_move(piece, destiny) is False:
+                return False
+            piece.move(destiny)
+            self._place_piece(piece, origin)
+            return True
+        except KeyError:
+            print(OUT_OF_BOUNDS)
             return False
-        if not self.__board.is_empty(destiny):
-            return False
-        piece = self.get_piece_by_coord(origin)
-        if self._check_valid_move(piece, destiny) is False:
-            return False
-        piece.move(destiny)
-        self._place_piece(piece, origin)
+
+    def jump_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
+        # checks not empty origin
+        # checks empty destiny
+        # Retrives piece from origin coord
+        # evaluates if there is a piece in the middle of the movement
+        # Must be valid for pawns and queens
+        # Must be from a different color than the origin piece.
+        # Checks if the jump is valid
+        # makes jump
+        # places piece
+        # removes adversary piece
+        # returns True
+        pass
