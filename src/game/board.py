@@ -70,6 +70,14 @@ class Board:
         self.__board[board_col][board_row].content = None
         self.__board[newb_col][newb_row].content = piece
 
+    def remove_piece(
+            self,
+            coordinates: Coordinates,
+    ) -> None:
+        col, row = coordinates
+        b_col, b_row = self.get_square(col, row)
+        self.__board[b_col][b_row].content = None
+
     def is_empty(self, coords: Coordinates) -> bool:
         col, row = coords
         c, r = self.get_square(col, row)

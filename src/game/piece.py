@@ -1,8 +1,5 @@
-from collections import namedtuple
 from abc import ABC, abstractmethod
-
-
-Coordinates = namedtuple('Coordinates', ['col', 'row'])
+from coordinates import Coordinates
 
 
 class Piece(ABC):

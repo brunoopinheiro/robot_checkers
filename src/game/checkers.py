@@ -89,6 +89,34 @@ class Checkers:
         c = (abs(a[0] - b[0]), abs(a[1] - b[1]))
         return max(c)
 
+    def __get_piece_from_middle(
+            self,
+            origin: Coordinates,
+            destiny: Coordinates,
+    ) -> Piece:
+        try:
+            dist = self.__distance(origin, destiny)
+            if Checkers.__colmap[origin.col] < Checkers.__colmap[destiny.col]:
+                # anda direita
+                if origin.row < destiny.row:
+                    # anda cima
+                    for _ in range(dist):
+                        pass
+                else:
+                    # anda baixo
+                    pass
+            else:
+                # anda esquerda
+                if origin.row < destiny.row:
+                    # anda cima
+                    pass
+                else:
+                    # anda baixo
+                    pass
+        except KeyError:
+            print(OUT_OF_BOUNDS)
+            return None
+
     def _place_piece(
             self,
             piece: Piece,
@@ -158,14 +186,26 @@ class Checkers:
 
     def jump_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
         # checks not empty origin
+        if self.__board.is_empty(origin):
+            return False
         # checks empty destiny
+        if not self.__board.is_empty(destiny):
+            return False
         # Retrives piece from origin coord
+        piece = self.get_piece_by_coord(origin)
         # evaluates if there is a piece in the middle of the movement
         # Must be valid for pawns and queens
+        middle_piece = self.__get_piece_from_middle(origin, destiny)  # implementar
         # Must be from a different color than the origin piece.
+        if middle_piece is None:
+            return False
+        if piece.color == middle_piece.color:
+            return False
         # Checks if the jump is valid
-        # makes jump
-        # places piece
+        if self._check_valid_jump(piece, destiny) is False:
+            return False
+        # makes jump places piece
+        piece.move(destiny)
         # removes adversary piece
-        # returns True
-        pass
+        self.__board.remove_piece(middle_piece.coordinates)
+        return True
