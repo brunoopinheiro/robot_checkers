@@ -1,6 +1,7 @@
 from PIL import Image
 import os
-
+import cv2
+import time
 
 
 def crop_center(pil_img, crop_width, crop_height):
@@ -15,11 +16,24 @@ def crop_max_square(pil_img):
 
 path_origin = 'src/visao/extracted_frames'
 
-path_save = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/cropped_pictures"
+path_save1 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/cropped_pictures"
 for img in os.listdir(path_origin):
     img_obj = Image.open(f"{path_origin}/{img}")
     img_obj_cropped = crop_max_square(img_obj)
-    print(f'Saving cropped picture {img}_cropped.jpg at path {path_save}...')
-    img_obj_cropped.save(f"{path_save}/{img}")
+    print(f'Saving cropped picture {img}_cropped.jpg at path {path_save1}...')
+    img_obj_cropped.save(f"{path_save1}/{img}")
+    
+
+print('DONE!')
+
+print('it will resize the pictures now...')
+time.sleep(2)
+
+path_save2 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/resized_pictures"
+
+for img in os.listdir(path_save1):
+    image = cv2.imread(f"{path_save1}/{img}")
+    imgResized = cv2.resize(image,(700, 700), interpolation=cv2.INTER_AREA)
+    cv2.imwrite(f"{path_save2}/{img}", imgResized)
 
 print('DONE!')
