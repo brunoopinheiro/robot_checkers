@@ -87,6 +87,12 @@ def main():
         destiny=Coordinates('f', 2),
         target_piece=Coordinates('e', 3),
     )
+    game.move_piece(
+        origin=Coordinates('f', 2),
+        destiny=Coordinates('g', 1)
+    )
+    game._promote_piece(Coordinates('g', 1))
+    game._promote_piece(Coordinates('h', 2))
     game.board_state()
 
 

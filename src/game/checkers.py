@@ -2,6 +2,7 @@ from __future__ import annotations
 from board import Board
 from piece import Coordinates, Piece
 from pawn import Pawn
+from queen import Queen
 from enum import Enum
 
 
@@ -150,6 +151,14 @@ class Checkers:
             if piece.coordinates == piece_coordinates:
                 self.p2_pieces.pop(idx)
 
+    def __swap_piece(self, new_piece: Piece) -> None:
+        for idx, piece in enumerate(self.p1_pieces):
+            if piece.coordinates == new_piece.coordinates:
+                self.p1_pieces[idx] = new_piece
+        for idx, piece in enumerate(self.p2_pieces):
+            if piece.coordinates == new_piece.coordinates:
+                self.p2_pieces[idx] = new_piece
+
     def move_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
         try:
             if self.__board.is_empty(origin):
@@ -188,3 +197,25 @@ class Checkers:
         self._place_piece(piece, origin)
         self.__remove_piece(middle_piece.coordinates)
         return True
+
+    def _promote_piece(
+            self,
+            coordinates: Coordinates,
+    ) -> Queen:
+        piece = self.get_piece_by_coord(coordinates)
+        queen = None
+        if piece.color == 'green':
+            queen = Queen(
+                coordinates=piece.coordinates,
+                color=piece.color,
+                icon='❇️',
+            )
+        if piece.color == 'purple':
+            queen = Queen(
+                coordinates=piece.coordinates,
+                color=piece.color,
+                icon='⚛️'
+            )
+        self.__remove_piece(piece.coordinates)
+        self._place_piece(queen, queen.coordinates)
+        self.__swap_piece(queen)
