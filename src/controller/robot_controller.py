@@ -3,12 +3,13 @@ from robots.pose import Pose
 from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
-from capture.cam import Capture
+from capture.protocol_cam_capture import Capture
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
 UPPER_MOVE_HEIGHT = 'upper_movement_height'
 UPPER_DROP = 'upper_drop_height'
+UPPER_VIEW = 'upper_view_board'
 
 
 class _RoboStates(Enum):
@@ -69,6 +70,14 @@ class RobotController:
         )
         print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
+
+    # def to_upperview(self) -> None:
+    #     """Moves the robot to the Upper Board pose via joints"""
+    #     upperviewjoints = self.move_map.get_joints(
+    #         key=_RoboStates.UPPER_VIEW.value,
+    #     )
+    #     print('Voltando à visão mais inferior do tabuleiro.')
+    #     self.robot.joint_move(upperviewjoints)
 
     def check_valid_keys(self, *args) -> bool:
         """Receives a variable number of map keys and checks
