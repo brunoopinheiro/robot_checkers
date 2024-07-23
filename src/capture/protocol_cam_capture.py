@@ -14,7 +14,7 @@ class Capture:
         if not self.capture.isOpened():
             raise ValueError("Cannot open camera")
 
-    def capture_image(self, interval=2, photo_count=0):
+    def capture_image(self, interval=5, photo_count=0):
         photo_count = int(input('Quantidade de imagens: '))
         photo_id = 0
 
@@ -23,15 +23,16 @@ class Capture:
         try:
             while photo_id < photo_count:
                 ret, frame = self.capture.read()
-                if ret:
-                    cv2.imshow('RobotCam', frame)
 
+                if ret:
                     photo_filename = os.path.join(self.output_dir, f'image_{photo_id+1}.png')  
-                    cv2.imwrite(photo_filename, frame)
+                    variavel = cv2.imwrite(photo_filename, frame)
+                    flipped = cv2.flip(variavel, 1)
                     print(f"Photo saved as {photo_filename}")
                     photo_id += 1
-                    
-                    key = cv2.waitKey(interval * 1000)
+                    cv2.imshow('RobotCam', flipped)
+
+                    key = cv2.waitKey(interval * 2000)
                     if key == ord('q'):
                          break
                 else:

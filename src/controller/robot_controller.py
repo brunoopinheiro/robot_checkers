@@ -17,7 +17,7 @@ UPPER_VIEW = 'upper_view_board'
 class _RoboStates(Enum):
     UNDEFINED = 'undefined'
     HOME = 'home'
-    UPPER_BOARD = 'upper_view'
+    UPPER_BOARD = 'upper_view_r2'
 
 
 class RobotController:
