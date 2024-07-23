@@ -26,8 +26,8 @@ class Capture:
 
                 if ret:
                     photo_filename = os.path.join(self.output_dir, f'image_{photo_id+1}.png')  
-                    variavel = cv2.imwrite(photo_filename, frame)
-                    flipped = cv2.flip(variavel, 1)
+                    write = cv2.imwrite(photo_filename, frame)
+                    flipped = cv2.flip(write, 1)
                     print(f"Photo saved as {photo_filename}")
                     photo_id += 1
                     cv2.imshow('RobotCam', flipped)
