@@ -73,14 +73,6 @@ class RobotController:
         print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
 
-    # def to_upperview(self) -> None:
-    #     """Moves the robot to the Upper Board pose via joints"""
-    #     upperviewjoints = self.move_map.get_joints(
-    #         key=_RoboStates.UPPER_VIEW.value,
-    #     )
-    #     print('Voltando à visão mais inferior do tabuleiro.')
-    #     self.robot.joint_move(upperviewjoints)
-
     def check_valid_keys(self, *args) -> bool:
         """Receives a variable number of map keys and checks
         if they all are valid keys."""
@@ -239,4 +231,3 @@ class RobotController:
         self.to_home()
         self.to_upperboard()
         self.__cam.capture_image()
-
