@@ -30,8 +30,8 @@ class Capture:
                 if ret:
                     basename = f'image_{photo_id+1}.png'
                     photo_filename = os.path.join(self.output_dir, basename)
-                    # flipped = cv2.flip(frame, 1)
-                    cv2.imshow('RobotCam', frame)
+                    flipped = cv2.flip(frame, 1)
+                    cv2.imshow('RobotCam', flipped)
                     key = cv2.waitKey(interval * 1000)
                     if key == ord('q'):
                         _stop = True
