@@ -1,4 +1,6 @@
+from __future__ import annotations
 from dataclasses import dataclass
+
 
 COLUMNS = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
 ROWS = (1, 2, 3, 4, 5, 6, 7, 8)
@@ -20,3 +22,11 @@ class Coordinates:
                 idx -= 1
         self.col = COLUMNS[idx]
         self.row += row_move
+
+    def __iter__(self):
+        return iter((self.col, self.row))
+
+    def __eq__(self, other: Coordinates) -> bool:
+        if self.col == other.col and self.row == other.row:
+            return True
+        return False
