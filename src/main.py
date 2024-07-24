@@ -183,8 +183,7 @@ def place_queen(robotcontroller: RobotController) -> None:
 
 def dataset_capture_position(robotcontroller: RobotController) -> None:
     robotcontroller.connect()
-    robotcontroller.to_upperboard()
-    input('Pressione qualquer tecla para continuar.')
+    robotcontroller.dataset_capture_position()
     robotcontroller.disconnect()
 
 
@@ -203,10 +202,12 @@ def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
     movebank = bank_choice()
+    cam_choice = int(input('Camera [0|1]: '))
 
     controller = RobotController(
         robot=robot,
         movebank=movebank,
+        cam_index=cam_choice,
     )
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
