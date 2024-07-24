@@ -3,7 +3,7 @@ from robots.pose import Pose
 from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
-from capture.protocol_cam_capture import Capture
+from capture.capture_module import CaptureModule
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
@@ -17,7 +17,7 @@ UPPER_VIEW = 'upper_view_board'
 class _RoboStates(Enum):
     UNDEFINED = 'undefined'
     HOME = 'home'
-    UPPER_BOARD = 'upper_view_r2'
+    UPPER_BOARD = 'upper_view'
 
 
 class RobotController:
@@ -43,11 +43,12 @@ class RobotController:
         self,
         robot: IRobot,
         movebank: MoveBank,
+        cam_index: int = 1,
     ) -> None:
         self.__robot = robot
         self.__movemap = movebank
         self.__state: _RoboStates = _RoboStates.UNDEFINED
-        self.__cam = Capture()
+        self.__cam = CaptureModule(cam_index)
 
     def connect(self) -> None:
         """Stablishes the robot connection"""
@@ -162,19 +163,19 @@ class RobotController:
             self.move_map.get_cartesian(tgt)
         print('Iniciando Captura de Peças')
         print(f'Origem: {origin}')
-        self.robot.close_tool(1)
+        # self.robot.close_tool()
         self.to_upperboard()
         z = self._to_upper_move(origin)
         origin_coord = self.move_map.get_cartesian(origin)
         self.robot.cartesian_move(origin_coord)
-        self.robot.close_tool(actuation_time=0.5)
+        self.robot.close_tool()
         for tgt in targets:
             self._move_z(z)
             print(f'Alvo: {tgt}')
             self._to_upper_move(tgt)
             tgt_coord = self.move_map.get_cartesian(tgt)
             self.robot.cartesian_move(tgt_coord)
-        self.robot.open_tool(actuation_time=0.5)
+        self.robot.open_tool()
         self._move_z(z)
         self.to_upperboard()
         self.robot.open_tool()
@@ -182,12 +183,12 @@ class RobotController:
     def remove_piece_from_board(self, piece_location: str) -> None:
         """Removes a piece from the board, based on its key location."""
         print(f'Removendo Peça {piece_location} do tabuleiro.')
-        self.robot.close_tool(1)
+        # self.robot.close_tool()
         self.to_upperboard()
         z = self._to_upper_move(piece_location)
         target_pose = self.move_map.get_cartesian(piece_location)
         self.robot.cartesian_move(target_pose)
-        self.robot.close_tool(actuation_time=0.5)
+        self.robot.close_tool()
         self._move_z(z)
         self.drop_piece()
 
@@ -195,11 +196,11 @@ class RobotController:
         """Retrieves a queen and returns to the
         `upper_movement_height` position"""
         print(f'Buscando {queen}')
-        self.robot.close_tool(1)
+        # self.robot.close_tool()
         self.to_upperboard()
         self._to_custom_pose(f'{queen}_pregrip')
         self._to_custom_coords(queen)
-        self.robot.close_tool(0.5)
+        self.robot.close_tool()
         print('Peça capturada')
         self._move_z(0.05)
         self._to_custom_pose(QUEEN_STEP1)
@@ -220,7 +221,7 @@ class RobotController:
             y=target.y,
         )
         self.robot.cartesian_move(target)
-        self.robot.open_tool(0.5)
+        self.robot.open_tool()
         print('Dama colocada')
         self._move_z(0.1)
         self._to_custom_pose(QUEEN_STEP2)

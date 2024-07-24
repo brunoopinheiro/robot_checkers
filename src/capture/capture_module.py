@@ -4,7 +4,7 @@ from typing import Optional
 from time import sleep
 
 
-class Capture:
+class CaptureModule:
     def __init__(self, camera_index=0):
         # Pode mudar a câmera a partir do índice
         self.camera_index = camera_index
@@ -31,12 +31,14 @@ class Capture:
                     basename = f'image_{photo_id+1}.png'
                     photo_filename = os.path.join(self.output_dir, basename)
                     flipped = cv2.flip(frame, 1)
-                    cv2.imshow('RobotCam', flipped)
+                    # This next line is needed
+                    # only to show the camera interface
+                    # cv2.imshow('RobotCam', flipped)
                     key = cv2.waitKey(interval * 1000)
                     if key == ord('q'):
                         _stop = True
                     else:
-                        cv2.imwrite(photo_filename, frame)
+                        cv2.imwrite(photo_filename, flipped)
                         print(f"Photo saved as {photo_filename}")
                         photo_id += 1
 

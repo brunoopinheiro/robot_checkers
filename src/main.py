@@ -202,10 +202,12 @@ def main():
     print('Projeto - Fábrica de Software 2')
     robot = robot_choice()
     movebank = bank_choice()
+    cam_choice = int(input('Camera [0|1]: '))
 
     controller = RobotController(
         robot=robot,
         movebank=movebank,
+        cam_index=cam_choice,
     )
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
