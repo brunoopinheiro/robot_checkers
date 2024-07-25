@@ -14,10 +14,15 @@ def crop_center(pil_img, crop_width, crop_height):
 def crop_max_square(pil_img):
     return crop_center(pil_img, min(pil_img.size), min(pil_img.size))
 
-path_origin = 'src/visao/extracted_frames'
+path_origin = 'src/visao/dataset_week_2/from_pictures2'
 
-path_save1 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/cropped_pictures"
-for img in os.listdir(path_origin):
+lista_imagens = []
+for i in os.listdir(path_origin):
+    if os.path.isfile(os.path.join(path_origin, i).replace('\\', '/')):
+        lista_imagens.append(i)
+
+path_save1 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/dataset_week_2/from_pictures2/final_cropped"
+for img in lista_imagens:
     img_obj = Image.open(f"{path_origin}/{img}")
     img_obj_cropped = crop_max_square(img_obj)
     print(f'Saving cropped picture {img}_cropped.jpg at path {path_save1}...')
@@ -29,7 +34,7 @@ print('DONE!')
 print('it will resize the pictures now...')
 time.sleep(2)
 
-path_save2 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/resized_pictures"
+path_save2 = "C:/Users/jlc/Documents/GitHub/equipe3-back/src/visao/dataset_week_2/from_pictures2/final_resized2"
 
 for img in os.listdir(path_save1):
     image = cv2.imread(f"{path_save1}/{img}")

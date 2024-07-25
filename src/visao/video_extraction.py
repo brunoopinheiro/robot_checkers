@@ -1,14 +1,13 @@
 import cv2
 import os
 
-cwd = os.getcwd()
 
 
-path = 'src/visao/video'
+path = 'src/visao/dataset_week_2/video2/'
 path_video = (os.path.join(path, (os.listdir(path)[0]))).replace('\\', '/')
 
 
-path_images = 'src/visao/extracted_frames'
+path_images = 'src/visao/dataset_week_2/extracted_frames2'
 
 
 
@@ -18,7 +17,7 @@ i = 1
 success = True
 while success:
     success,image = captured_video.read()
-    if count%15 == 0 :
+    if count%20 == 0 :
             print(f'Processing frame {i} - sucessso: {success}')
             cv2.imwrite(os.path.join(path_images, f'picture{i}.jpg'), image)
             i += 1
