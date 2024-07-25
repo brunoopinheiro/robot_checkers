@@ -2,6 +2,7 @@ from ultralytics import YOLO
 from PIL import Image, UnidentifiedImageError
 from enum import Enum
 from typing import Optional
+from json import loads
 
 
 class YOLOModels(Enum):
@@ -31,10 +32,36 @@ class Model:
             ) as err:
                 print(err)
                 print('Using webcam image')
-        result = self.__model.predict(
+        results = self.__model.predict(
             source=image,
             show=True,
             save=True,
             save_txt=True,
         )
-        print(result)
+        for r in results:
+            boxes = r.boxes
+            print('Boxes: ', boxes)
+            masks = r.masks
+            print('Masks: ', masks)
+            keypoints = r.keypoints
+            print('Keypoints: ', keypoints)
+            probs = r.probs
+            print('Probs: ', probs)
+            obb = r.obb
+            print('Or Obj Boxes: ', obb)
+            r.show()
+            jsonr = r.tojson()
+            print(jsonr)
+
+    def predict_from_opencv(self, cv_image) -> dict:
+        # res will always be a list with one element
+        res = self.__model.predict(
+            source=cv_image,
+            show=False,
+            save=True,
+            save_txt=True,
+        )
+        r = res[0]
+        jsonr = r.tojson()
+        resdict = loads(jsonr)
+        return resdict
