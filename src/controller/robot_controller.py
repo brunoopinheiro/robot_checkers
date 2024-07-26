@@ -228,6 +228,15 @@ class RobotController:
         self.to_upperboard()
         self.robot.open_tool()
 
+    def read_board(self) -> None:
+        self.to_upperboard()
+        img = self.__cam.capture_opencv()
+        # We are still evaluating if the neural network model
+        # will be integrated to this class, or to the outter
+        # flask app. For now, we will only return the camera
+        # image to be used outside the class.
+        return img
+
     def dataset_capture_position(self) -> None:
         self.to_home()
         self.to_upperboard()

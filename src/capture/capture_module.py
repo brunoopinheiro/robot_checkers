@@ -49,3 +49,12 @@ class CaptureModule:
         finally:
             self.video_capture.release()
             cv2.destroyAllWindows()
+
+    def capture_opencv(
+            self,
+    ):
+        for i in range(2):
+            ret, frame = self.video_capture.read()
+            if ret and i == 1:
+                flipped = cv2.flip(frame, 1)
+                return flipped

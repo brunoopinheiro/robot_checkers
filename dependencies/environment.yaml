@@ -11,3 +11,9 @@ dependencies:
       - Flask
       - waitress
       - opencv-python
+      - numpy
+      - torch
+      - torchvision
+      - torchaudio
+      - ultralytics
+      - "betterproto[compiler]"
