@@ -6,7 +6,7 @@ dependencies:
   - pip
   - pip:
       - file:kortex_api-2.3.0.post34-py3-none-any.whl
-      - rria-api==1.0.11
+      - rria-api==1.0.12
       - keyboard
       - Flask
       - waitress
