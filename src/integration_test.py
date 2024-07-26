@@ -1,5 +1,6 @@
 from neural_network.model import Model
 from capture.capture_module import CaptureModule
+from pprint import pprint
 
 
 def main():
@@ -8,7 +9,7 @@ def main():
 
     model = Model()
     resdict = model.predict_from_opencv(img)
-    print(resdict)
+    pprint(resdict)
 
 
 if __name__ == '__main__':

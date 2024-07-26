@@ -8,6 +8,7 @@ from robots.test_robot import TestRobot
 from controller.robot_controller import RobotController
 from utils.emergency_stop import EmergencyStop
 from movebank.movebank import MoveBank, RobotTableEnum
+from neural_network.model import Model
 
 
 def get_positions(robot: IRobot):
@@ -187,6 +188,18 @@ def dataset_capture_position(robotcontroller: RobotController) -> None:
     robotcontroller.disconnect()
 
 
+def detect_board(robotcontroller: RobotController, model: Model) -> None:
+    robotcontroller.connect()
+    img = robotcontroller.read_board()
+    print('Image successfully read.')
+    print('Calling the Model to detect pieces.')
+    print('This may take a while, please wait...')
+    resultdict = model.predict_from_opencv(img)
+    print(resultdict)
+    print("This result is not yet being interpreted.")
+    robotcontroller.disconnect()
+
+
 def __print_menu() -> None:
     print('== Robot Operation ==')
     print('[1] - Test Positions')
@@ -195,6 +208,7 @@ def __print_menu() -> None:
     print('[4] - Remove Piece')
     print('[5] - Place Queen')
     print('[6] - Dataset Capture Pose')
+    print('[7] - Detect Board')
     print('[0] - EXIT')
 
 
@@ -211,6 +225,8 @@ def main():
     )
     emergency_stop = EmergencyStop(robot)
     emergency_stop.initiate_emergency_stop()
+
+    model = Model()
 
     __print_menu()
     _stop = False
@@ -235,7 +251,9 @@ def main():
             place_queen(controller)
         if menuchoice == 6:
             dataset_capture_position(controller)
-        else:
+        if menuchoice == 7:
+            detect_board(controller, model)
+        if menuchoice != 0:
             __print_menu()
 
 
