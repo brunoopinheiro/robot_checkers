@@ -113,3 +113,39 @@ Para remover uma peça do tabuleiro, basta selcionar a opção `4` no menu de es
 Para colocar uma dama no tabuleiro, basta selecionar a opção `5` no menu de escolha de tarefas. Em seguida, o menu de escolha de movimentação será exibido, esperando a informação da coordenada `LetraNumero` (ex: `A1`, `B2`, `C3`, etc) da casa onde a dama será colocada. Em seguida, o programa solicitará a informação de qual dama deve ser colocada. A movimentação do robô espera que as damas sejam colocadas nas posições paralelas às casas pretas no lado direito (da visão do robô), sendo numeradas de 1 a 4, onde 1 é a dama mais próxima ao robô, e 4 a mais distante.
 
 ![Menu de Escolha de Colocação de Dama](docs/images/place_queen.png)
+
+## Entregável Semana 2 - Rede Neural
+As atividades esperadas para a semana 2 do projeto, referentes ao _backend_ do projeto eram:
+- Classe de Captura Estruturada
+- Identificação das peças por visão
+    - Finalizar documento de protocolo de visão
+    - Marcar o dataset
+    - Treinar e validar a rede neural
+
+### Classe de Captura Estruturada
+A classe de captura está implementada no arquivo [`CaptureModule`](src/capture/capture_module.py) e utiliza a biblioteca `OpenCV` para captura de imagens à partir da camera do robô. Essa classe foi integrada ao [`RobotController`](src/controller/robot_controller.py) para que seja utilizada em conjunto com a movimentação do robô.
+
+### Identificação das peças por visão
+Para identificação das peças no tabuleiro, foi criado um protocolo de captura do _dataset_ utilizado para treinamento do modelo de rede neural. O protocolo de captura está disponível no seguinte link: [PROTOCOLO](https://docs.google.com/document/d/1FVtHBq_QLh-Y67N46X8N2KNFBzwc_TVrqcVY5HXSXLk/edit?usp=sharing).
+
+O dataset foi capturado com auxílio do próprio robô, e marcado utilizando a plataforma `Roboflow`. O dataset marcado está temporariamente disponível na raiz do repositório: [DATASET](dataset_checkers.zip).
+
+O treinamento da rede neural foi utilizado com auxílio de um [_Jupyter Notebook_](https://colab.research.google.com/drive/151i9hBsU6c38rrP71jIaCDY4XBY-yv7b?usp=sharing), para que pudessemos fazer uso de GPUs mais robustas e diminuir o tempo necessário para treino. Foi treinado um modelo `nano` da `YOLOv8`, e o modelo pré-treinado está disponível no arquivo [`best.pt`](best.pt).
+
+O modelo foi integrado ao projeto com a classe [`Model`](src/neural_network/model.py), que é responsável por detectar as peças no tabuleiro e retornar as coordenadas de cada peça identificada. A interpretação do resultado da rede neural ainda está em desenvolvimento.
+
+É possível executar uma pequena demonstração dos resultados da rede neural através do arquivo [`main.py`](src/main.py), selecionando a opção `7` no menu de escolha de tarefas, nomeado como `Detect Board`. Vale ressaltar que não tivemos tempo de testar este _script_ no **Kinova**, mas cada parte foi testada individualmente, e a integração funcionou bem com o **Robô de Testes**.
+
+```powershell
+python .\src\main.py
+```
+
+O resultado esperado é que a classe `Model` retorne um dicionário com as coordenadas e classe de cada peça identificada. A posterior interpretação do estado do tabuleiro, à partir da leitura, será uma tarefa da próxima _sprint_. Além disso, por enquanto a `Model` ainda está marcada com os parâmetros responsáveis por salvar a imagem marcada, e um arquivo `txt` com as _bounding boxes_ de identificação.
+
+![Imagem Marcada](images/marked_image.jpg)
+
+As classes utilizadas no treinamento foram mapeadas na classe [`DetectionClasses`](src/neural_network/detection_classes.py), sendo elas:
+- `green`: que representa um peão verde
+- `green_checker`: que representa uma dama verde
+- `purple`: que representa um peão roxo
+- `purple_checker`: que representa uma dama roxa
