@@ -4,6 +4,7 @@ from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
 from capture.capture_module import CaptureModule
+from cv2.typing import MatLike
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
@@ -12,6 +13,7 @@ UPPER_DROP = 'upper_drop_height'
 QUEEN_STEP1 = 'queen_placement_middle'
 QUEEN_STEP2 = 'queen_placement_row8'
 UPPER_VIEW = 'upper_view_board'
+SAFE_SHUTDOWN = 'safe_shutdown'
 
 
 class _RoboStates(Enum):
@@ -43,7 +45,7 @@ class RobotController:
         self,
         robot: IRobot,
         movebank: MoveBank,
-        cam_index: int = 1,
+        cam_index: int = 0,
     ) -> None:
         self.__robot = robot
         self.__movemap = movebank
@@ -73,6 +75,12 @@ class RobotController:
         )
         print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
+
+    def to_disconnect(self) -> None:
+        joints_ = self.move_map.get_joints(
+            key=SAFE_SHUTDOWN
+        )
+        self.robot.joint_move(joints_)
 
     def check_valid_keys(self, *args) -> bool:
         """Receives a variable number of map keys and checks
@@ -228,7 +236,7 @@ class RobotController:
         self.to_upperboard()
         self.robot.open_tool()
 
-    def read_board(self) -> None:
+    def read_board(self) -> MatLike:
         self.to_upperboard()
         img = self.__cam.capture_opencv()
         # We are still evaluating if the neural network model

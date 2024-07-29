@@ -8,11 +8,16 @@ class CaptureModule:
     def __init__(self, camera_index=0):
         # Pode mudar a câmera a partir do índice
         self.camera_index = camera_index
-        self.video_capture = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
+        self.video_capture = cv2.VideoCapture(
+            0,
+            cv2.CAP_DSHOW,
+        )
         self.output_dir = 'images'
         os.makedirs(self.output_dir, exist_ok=True)
+        sleep(5)
         if not self.video_capture.isOpened():
-            raise SystemError("Cannot open camera")
+            print('Cannot Open')
+            # raise SystemError("Cannot open camera")
 
     def capture_image(
             self,
@@ -58,3 +63,9 @@ class CaptureModule:
             if ret and i == 1:
                 flipped = cv2.flip(frame, 1)
                 return flipped
+
+
+if __name__ == "__main__":
+    capclass = CaptureModule(1)
+    res = capclass.capture_opencv()
+    print(res)

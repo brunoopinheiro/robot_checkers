@@ -65,7 +65,7 @@ class FlaskApp:
         robot = None
         if robot_type == RobotEnum.KINOVA:
             robot = KinovaRobot()
-            cam_index = 1
+            cam_index = 0
         else:
             robot = TestRobot()
         return RobotController(

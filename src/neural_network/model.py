@@ -58,7 +58,7 @@ class Model:
         # res will always be a list with one element
         res = self.__model.predict(
             source=cv_image,
-            show=False,
+            show=True,
             save=True,
             save_txt=True,
         )

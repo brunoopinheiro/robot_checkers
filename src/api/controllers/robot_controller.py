@@ -64,6 +64,7 @@ def construct_robot_blueprint(
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
         img = robotcontroller.read_board()
+        print(img)
         print('Image successfully read.')
         print('Calling the Model to detect pieces.')
         print('This may take a while, please wait...')
@@ -71,5 +72,10 @@ def construct_robot_blueprint(
         # This will change to protobuf once the translation
         # between pixels and board squares is done.
         return jsonify(result_dict), 200
+
+    @robot_controller.route('/disconnect', methods=['GET'])
+    def to_disconnect():
+        robotcontroller.to_disconnect()
+        return jsonify({'ok': 200}), 200
 
     return robot_controller
