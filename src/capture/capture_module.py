@@ -5,6 +5,16 @@ from time import sleep
 
 
 class CaptureModule:
+
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.__instance:
+            cls.__instance = super(
+                CaptureModule,
+                cls).__new__(cls)
+        return cls.__instance
+
     def __init__(self, camera_index=0):
         # Pode mudar a câmera a partir do índice
         self.camera_index = camera_index

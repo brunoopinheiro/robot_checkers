@@ -3,8 +3,6 @@ from robots.pose import Pose
 from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
-from capture.capture_module import CaptureModule
-from cv2.typing import MatLike
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
@@ -45,12 +43,10 @@ class RobotController:
         self,
         robot: IRobot,
         movebank: MoveBank,
-        cam_index: int = 0,
     ) -> None:
         self.__robot = robot
         self.__movemap = movebank
         self.__state: _RoboStates = _RoboStates.UNDEFINED
-        self.__cam = CaptureModule(cam_index)
 
     def connect(self) -> None:
         """Stablishes the robot connection"""
@@ -236,16 +232,7 @@ class RobotController:
         self.to_upperboard()
         self.robot.open_tool()
 
-    def read_board(self) -> MatLike:
-        self.to_upperboard()
-        img = self.__cam.capture_opencv()
-        # We are still evaluating if the neural network model
-        # will be integrated to this class, or to the outter
-        # flask app. For now, we will only return the camera
-        # image to be used outside the class.
-        return img
-
-    def dataset_capture_position(self) -> None:
-        self.to_home()
-        self.to_upperboard()
-        self.__cam.capture_image()
+    # def dataset_capture_position(self) -> None:
+    #     self.to_home()
+    #     self.to_upperboard()
+    #     self.__cam.capture_image()

@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, make_response
 from controller.robot_controller import RobotController
 from neural_network.model import Model
+from capture.capture_module import CaptureModule
 
 
 def construct_robot_blueprint(
         robotcontroller: RobotController,
         model: Model,
+        capture_module: CaptureModule,
 ) -> Blueprint:
 
     robot_controller = Blueprint('robot_controller', __name__)
@@ -63,7 +65,8 @@ def construct_robot_blueprint(
 
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
-        img = robotcontroller.read_board()
+        robotcontroller.to_upperboard()
+        img = capture_module.capture_opencv()
         print(img)
         print('Image successfully read.')
         print('Calling the Model to detect pieces.')

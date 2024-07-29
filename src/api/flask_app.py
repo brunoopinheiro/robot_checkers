@@ -12,6 +12,7 @@ from movebank.movebank import (
     RobotTableEnum,
 )
 from neural_network.model import Model
+from capture.capture_module import CaptureModule
 
 
 class FlaskApp:
@@ -23,7 +24,7 @@ class FlaskApp:
         table: RobotTableEnum = RobotTableEnum.KINOVA,
     ) -> None:
         self.__app = Flask(__name__)
-        # a lot of things here
+        self._cvmod = CaptureModule()
         self._robot_controller = self.__initiate_robot_controller(
             robot_type=robot_type,
             table=table,
@@ -45,6 +46,7 @@ class FlaskApp:
         robot_controller = construct_robot_blueprint(
             self._robot_controller,
             self._model,
+            self._cvmod,
         )
         home_controller = construct_home_blueprint()
         self.__app.register_blueprint(
@@ -60,18 +62,15 @@ class FlaskApp:
             self,
             robot_type: RobotEnum,
             table: RobotTableEnum,
-            cam_index: int = 0,
     ) -> RobotController:
         robot = None
         if robot_type == RobotEnum.KINOVA:
             robot = KinovaRobot()
-            cam_index = 0
         else:
             robot = TestRobot()
         return RobotController(
             robot=robot,
             movebank=MoveBank(table),
-            cam_index=cam_index,
         )
 
     def debug_server(self) -> None:
