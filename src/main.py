@@ -1,54 +1,47 @@
-from flask import Flask
-from waitress import serve
-from api.controllers.home_controller import home_controller
-from api.controllers.robot_controller import robot_controller
-
-
-class FlaskApp:
-
-    def __init__(
-        self,
-        debug: bool = False,
-    ) -> None:
-        self.__app = Flask(__name__)
-        # a lot of things here
-        self.__register_template()
-        self.__register_blueprints()
-        if debug:
-            self.debug_server()
-        else:
-            self.start_server()
-
-    def __register_template(self) -> None:
-        self.__app.static_folder = 'api/views/static'
-        self.__app.template_folder = 'api/views/template'
-
-    def __register_blueprints(self) -> None:
-        self.__app.register_blueprint(
-            robot_controller,
-            url_prefix='/robot',
-        )
-        self.__app.register_blueprint(
-            home_controller,
-            url_prefix='/',
-        )
-
-    def debug_server(self) -> None:
-        self.__app.run(
-            debug=True,
-            host='0.0.0.0',
-            port='5000',
-        )
-
-    def start_server(self) -> None:
-        serve(
-            self.__app,
-            host='0.0.0.0',
-            port='5000',
-        )
+from getopt import getopt
+from sys import argv
+from api.flask_app import FlaskApp
+from robots.robot_enum import RobotEnum
+from movebank.movebank import RobotTableEnum
 
 
 if __name__ == "__main__":
-    app = FlaskApp(
-        debug=True,
-    )
+    try:
+        cli_args = argv[1:]
+        debug_mode = False
+        robot_type = None
+        robot_table = None
+        options, args = getopt(
+            cli_args,
+            'd:r:t:',
+            ['debug=', 'robot=', 'table='],
+        )
+        for name, value in options:
+            if name in ['-d', '--debug']:
+                if value.upper() == 'TRUE':
+                    # -d True
+                    # --debug True
+                    print('Running in Debug Mode')
+                    debug_mode = True
+                else:
+                    print('Running in Production Mode')
+                    debug_mode = False
+            elif name in ['-r', '--robot']:
+                if value.upper() == 'TEST':
+                    robot_type = RobotEnum.TEST
+                else:
+                    robot_type = RobotEnum.KINOVA
+            elif name in ['-t', '--table']:
+                if value == '1':
+                    robot_table = RobotTableEnum.KINOVA
+                else:
+                    robot_table = RobotTableEnum.KANOVA
+        # later should allow for selecting robot and table
+    except Exception as e:
+        print('Parsing Error: ', e)
+    finally:
+        app = FlaskApp(
+            debug=debug_mode,
+            robot_type=robot_type,
+            robot_table=robot_table,
+        )

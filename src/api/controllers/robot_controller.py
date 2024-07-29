@@ -50,3 +50,8 @@ def robot_methods():
             'description': 'Requests the robot to detect the actual board state.'
         },
     }), 200
+
+
+@robot_controller.route('/detect', methods=['GET'])
+def detect():
+    pass
