@@ -30,9 +30,8 @@ def coordenadas(casa_a1, lista_casas):
         b = 0
         for i in range(len(casa)):
             if i%2 != 0:
-                if i == 0:
-                    casa[i] = casa_a1[i]*(cateto_oposto_y*((1-a)))
-                    a += 1/4
+                casa[i] = casa_a1[i]*(cateto_oposto_y*((1-a)))
+                a += 1/4
             else:
                 casa[i] = casa_a1[i]*(cateto_oposto_x*((1+b)))
                 b += 1/8
