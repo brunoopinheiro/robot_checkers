@@ -64,14 +64,14 @@ class KinovaRobot(IRobot):
     @check_faultstate
     def open_tool(self, actuation_time: float = 1) -> bool:
         print('Abrindo Garra')
-        self.kinova.open_gripper(actuation_time)
+        self.kinova.open_gripper(actuation_time, finger_value=0.6)
         super().open_tool(actuation_time)
 
     @check_connection
     @check_faultstate
     def close_tool(self, actuation_time: float = 1) -> bool:
         print('Fechando Garra')
-        self.kinova.close_gripper(actuation_time)
+        self.kinova.close_gripper(actuation_time, finger_value=0.85)
         super().close_tool(actuation_time)
 
     @check_connection
