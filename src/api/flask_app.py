@@ -1,7 +1,7 @@
 from flask import Flask
 from waitress import serve
 from api.controllers.home_controller import home_controller
-from api.controllers.robot_controller import robot_controller
+from api.controllers.robot_controller import construct_robot_blueprint
 
 from controller.robot_controller import RobotController
 from robots.robot_enum import RobotEnum
@@ -11,6 +11,7 @@ from movebank.movebank import (
     MoveBank,
     RobotTableEnum,
 )
+from neural_network.model import Model
 
 
 class FlaskApp:
@@ -23,12 +24,14 @@ class FlaskApp:
     ) -> None:
         self.__app = Flask(__name__)
         # a lot of things here
-        self.__register_template()
-        self.__register_blueprints()
-        self.__robot_controller = self.__initiate_robot_controller(
+        self._robot_controller = self.__initiate_robot_controller(
             robot_type=robot_type,
             table=table,
         )
+        self._model = Model()
+        self.__register_template()
+        self.__register_blueprints()
+        self._robot_controller.connect()
         if debug:
             self.debug_server()
         else:
@@ -39,6 +42,10 @@ class FlaskApp:
         self.__app.template_folder = 'api/views/template'
 
     def __register_blueprints(self) -> None:
+        robot_controller = construct_robot_blueprint(
+            self._robot_controller,
+            self._model,
+        )
         self.__app.register_blueprint(
             robot_controller,
             url_prefix='/robot',
