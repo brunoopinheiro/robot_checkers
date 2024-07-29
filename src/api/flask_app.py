@@ -1,6 +1,6 @@
 from flask import Flask
 from waitress import serve
-from api.controllers.home_controller import home_controller
+from api.controllers.home_controller import construct_home_blueprint
 from api.controllers.robot_controller import construct_robot_blueprint
 
 from controller.robot_controller import RobotController
@@ -38,14 +38,15 @@ class FlaskApp:
             self.start_server()
 
     def __register_template(self) -> None:
-        self.__app.static_folder = 'api/views/static'
-        self.__app.template_folder = 'api/views/template'
+        self.__app.static_folder = 'views/static'
+        self.__app.template_folder = 'views/template'
 
     def __register_blueprints(self) -> None:
         robot_controller = construct_robot_blueprint(
             self._robot_controller,
             self._model,
         )
+        home_controller = construct_home_blueprint()
         self.__app.register_blueprint(
             robot_controller,
             url_prefix='/robot',

@@ -21,11 +21,14 @@ if __name__ == "__main__":
                 if value.upper() == 'TEST':
                     robot_type = RobotEnum.TEST
                 else:
+                    print('Kinova Robot')
                     robot_type = RobotEnum.KINOVA
             elif name in ['-t', '--table']:
                 if value == '1':
+                    print('Table 1')
                     robot_table = RobotTableEnum.KINOVA
                 else:
+                    print('Table 2')
                     robot_table = RobotTableEnum.KANOVA
             elif name in ['-d', '--debug']:
                 print('Running in Debug mode')

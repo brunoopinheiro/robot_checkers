@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, make_response
 from controller.robot_controller import RobotController
 from neural_network.model import Model
 
@@ -10,53 +10,56 @@ def construct_robot_blueprint(
 
     robot_controller = Blueprint('robot_controller', __name__)
 
-    @robot_controller.route('/', methods=['GET'])
+    @robot_controller.route('/help', methods=['GET'])
     def robot_methods():
         return jsonify({
             0: {
                 'title': 'Test Positions',
-                'route': '.../test_positions/<pos_key: str>',
+                'route': '.../test_position/<pos_key>/<move_type>',
                 'http_method': 'GET',
                 'description': 'Allows to test bank positions for the robot.'
             },
             1: {
-                'title': 'GET Positions',
-                'route': '.../get_positions/<pos_key: str>',
-                'http_method': 'POST',
-                'description': 'Requests the robot to save the key to the movebank.'
+                'title': 'Get Position',
+                'route': '.../position',
+                'http_method': 'GET',
+                'description': 'Retrieves the actual robot Joint and Pose.'
             },
             2: {
-                'title': 'Move Pieces',
-                'route': '.../move_pieces/<list_pos_key: list[str]>',
-                'http_method': 'GET',
-                'description': '''Moves the robot arm throught the board,
-                grasping the piece at the first reference and releasing at the last.'''
-            },
-            3: {
-                'title': 'Remove Piece',
-                'route': '.../remove_piece/<pos_key: str>',
-                'http_method': 'GET',
-                'description': 'Requests the robot arm to remove a piece from the board.'
-            },
-            4: {
-                'title': 'Place Queen',
-                'route': '.../place_queen/<pos_key, queen: tuple[str, int]>',
-                'http_method': 'GET',
-                'description': 'Requests the robot arm to place a queen in the board.'
-            },
-            5: {
-                'title': 'Capture Dataset Photos',
-                'route': '.../dataset/<photos: int>',
-                'http_method': 'GET',
-                'description': 'Requests the robot to capture N photos for the dataset.'
-            },
-            6: {
                 'title': 'Detect Board',
                 'route': '.../detect',
                 'http_method': 'GET',
-                'description': 'Requests the robot to detect the actual board state.'
+                'description': 'Requests the robot to detect the actual board.'
             },
         }), 200
+
+    @robot_controller.route('/position', methods=['GET'])
+    def position():
+        joints, pose = robotcontroller.get_positions()
+        return jsonify({
+            'joints': joints.to_dict,
+            'pose': pose.to_dict,
+        }), 200
+
+    @robot_controller.route('/test_position/<pos_key>/<move_type>')
+    def test_position(pos_key, move_type):
+        try:
+            if move_type.lower() in ('c', 'cartesian'):
+                robotcontroller._to_custom_coords(pos_key)
+            else:
+                robotcontroller._to_custom_pose(pos_key)
+            response = make_response(
+                'Moving to position',
+                200,
+            )
+            return response
+        except KeyError as err:
+            bad_response = make_response(
+                f'Key {pos_key} of type {move_type} not found',
+                400,
+            )
+            print(err)
+            return bad_response
 
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
