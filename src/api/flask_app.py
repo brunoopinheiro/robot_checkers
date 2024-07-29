@@ -52,15 +52,18 @@ class FlaskApp:
             self,
             robot_type: RobotEnum,
             table: RobotTableEnum,
+            cam_index: int = 0,
     ) -> RobotController:
         robot = None
         if robot_type == RobotEnum.KINOVA:
             robot = KinovaRobot()
+            cam_index = 1
         else:
             robot = TestRobot()
         return RobotController(
             robot=robot,
-            movebank=MoveBank(table)
+            movebank=MoveBank(table),
+            cam_index=cam_index,
         )
 
     def debug_server(self) -> None:

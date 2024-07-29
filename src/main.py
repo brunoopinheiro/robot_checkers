@@ -9,24 +9,15 @@ if __name__ == "__main__":
     try:
         cli_args = argv[1:]
         debug_mode = False
-        robot_type = None
-        robot_table = None
+        robot_type = RobotEnum.TEST
+        robot_table = RobotTableEnum.KANOVA
         options, args = getopt(
             cli_args,
-            'd:r:t:',
-            ['debug=', 'robot=', 'table='],
+            'r:t:d',
+            ['robot=', 'table=', 'debug'],
         )
         for name, value in options:
-            if name in ['-d', '--debug']:
-                if value.upper() == 'TRUE':
-                    # -d True
-                    # --debug True
-                    print('Running in Debug Mode')
-                    debug_mode = True
-                else:
-                    print('Running in Production Mode')
-                    debug_mode = False
-            elif name in ['-r', '--robot']:
+            if name in ['-r', '--robot']:
                 if value.upper() == 'TEST':
                     robot_type = RobotEnum.TEST
                 else:
@@ -36,12 +27,14 @@ if __name__ == "__main__":
                     robot_table = RobotTableEnum.KINOVA
                 else:
                     robot_table = RobotTableEnum.KANOVA
-        # later should allow for selecting robot and table
+            elif name in ['-d', '--debug']:
+                print('Running in Debug mode')
+                debug_mode = True
     except Exception as e:
         print('Parsing Error: ', e)
     finally:
         app = FlaskApp(
             debug=debug_mode,
             robot_type=robot_type,
-            robot_table=robot_table,
+            table=robot_table,
         )
