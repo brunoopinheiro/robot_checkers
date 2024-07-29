@@ -166,3 +166,5 @@ runs/*
 yolov8n.pt
 datasets/*
 !datasets/readme.md
+src/visao/*
+*.png
