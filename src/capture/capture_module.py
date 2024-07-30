@@ -24,7 +24,7 @@ class CaptureModule:
         )
         self.output_dir = 'images'
         os.makedirs(self.output_dir, exist_ok=True)
-        sleep(5)
+        # sleep(5)
         if not self.video_capture.isOpened():
             # this should've been a raise
             # but we explicitly choose to left it

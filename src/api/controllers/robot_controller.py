@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, make_response
 from controller.robot_controller import RobotController
 from neural_network.model import Model
 from capture.capture_module import CaptureModule
+# from time import sleep
 
 
 def construct_robot_blueprint(
@@ -66,9 +67,16 @@ def construct_robot_blueprint(
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
         robotcontroller.to_upperboard()
+        img = None
+        count = 0
         capture_module = CaptureModule(1)
-        img = capture_module.capture_opencv()
-        print(img)
+        while img is None:
+            # sleep(3)
+            img = capture_module.capture_opencv()
+            print(img)
+            print('Retrying... ', count)
+            # TODO: find a way to kill a running instance of a singleton
+            count += 1
         print('Image successfully read.')
         capture_module.video_capture.release()
         print('Calling the Model to detect pieces.')
