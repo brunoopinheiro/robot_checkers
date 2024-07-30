@@ -39,11 +39,9 @@ def coordenadas(casa_a1, dicionario_casas):
     shift_x = 100
     i = 1
     for a in ['a3', 'a5', 'a7']:
-        dicionario_casas[a][0] = dicionario_casas['a1'][0]-shift_x*i
-        dicionario_casas[a][2] = dicionario_casas[a][0]-50
-        i += 1
-        dicionario_casas[a][1] = dicionario_casas['a1'][1]
-        dicionario_casas[a][3] = dicionario_casas['a1'][3] # Incluir o pequeno desvio
+        dicionario_casas[a][0] = dicionario_casas['a1'][0]-shift_x*1
+        shift_x = 50
+        dicionario_casas[a][2] = dicionario_casas[a][0]-shift_x*1
         
     for b, a in zip(['b2', 'b4', 'b6', 'b8'], ['a1','a3', 'a5', 'a7']):
         if b == 'b8':
@@ -52,22 +50,9 @@ def coordenadas(casa_a1, dicionario_casas):
             k = 0
         dicionario_casas[b][0] = dicionario_casas[a][2]
         dicionario_casas[b][2] = dicionario_casas[a][0]+k
-        
-        dicionario_casas[b][1] = dicionario_casas['a1'][1]+50
-        dicionario_casas[b][3] = dicionario_casas['a1'][3]+50 # Incluir o pequeno desvio
-        
-    
     for c, b in zip(['c1', 'c3', 'c5', 'c7'], ['b2', 'b4', 'b6', 'b8']):
-        if c == 'c1':
-            dicionario_casas[c][0] = dicionario_casas[b][2]
-            dicionario_casas[c][2] = dicionario_casas[b][0]
-        else:
-            dicionario_casas[c][0] = dicionario_casas[b][2]
-            dicionario_casas[c][2] = dicionario_casas[b][0]
-            i += 1
-        dicionario_casas[c][1] = dicionario_casas[b][3]
-        dicionario_casas[c][3] = dicionario_casas[c][1]+50 # somar ou subtrai? Verificar a imagem
-        
+        dicionario_casas[c][0] = dicionario_casas[b][2]
+        dicionario_casas[c][2] = dicionario_casas[b][0]
     for d, c in zip(['d2', 'd4', 'd6', 'd8'], ['c1', 'c3', 'c5', 'c7']):
         if d == 'd8':
             k = 50
@@ -75,19 +60,9 @@ def coordenadas(casa_a1, dicionario_casas):
             k = 0
         dicionario_casas[d][0] = dicionario_casas[c][2]
         dicionario_casas[d][2] = dicionario_casas[c][0]+k
-        
-        dicionario_casas[d][1] = dicionario_casas[c][3]
-        dicionario_casas[d][3] = dicionario_casas[d][1]+50
-        
-        
-    shift_x = 100
-    i = 1
     for e, d in zip(['e1', 'e3', 'e5', 'e7'], ['d2', 'd4', 'd6', 'd8']):
         dicionario_casas[e][0] = dicionario_casas[d][2]
         dicionario_casas[e][2] = dicionario_casas[d][0]
-        
-        
-        
     for f, e in zip(['f2', 'f4', 'f6', 'f8'], ['e1', 'e3', 'e5', 'e7']):
         if f == 'f8':
             k = 50

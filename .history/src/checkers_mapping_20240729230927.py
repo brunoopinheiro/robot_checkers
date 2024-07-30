@@ -78,15 +78,9 @@ def coordenadas(casa_a1, dicionario_casas):
         
         dicionario_casas[d][1] = dicionario_casas[c][3]
         dicionario_casas[d][3] = dicionario_casas[d][1]+50
-        
-        
-    shift_x = 100
-    i = 1
     for e, d in zip(['e1', 'e3', 'e5', 'e7'], ['d2', 'd4', 'd6', 'd8']):
         dicionario_casas[e][0] = dicionario_casas[d][2]
         dicionario_casas[e][2] = dicionario_casas[d][0]
-        
-        
         
     for f, e in zip(['f2', 'f4', 'f6', 'f8'], ['e1', 'e3', 'e5', 'e7']):
         if f == 'f8':
