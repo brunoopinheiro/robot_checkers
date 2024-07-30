@@ -1,5 +1,5 @@
-from neural_network.yolo_test import Model, cv2
-from neural_network.yolo_test import main
+# from neural_network.yolo_test import Model, cv2
+# from neural_network.yolo_test import main
 
 
 # (piece) [x2, y1, x1, y2]
@@ -51,21 +51,27 @@ class Mapping:
 
     
     
-if __name__ == "__main__":
-    Mapping.mapping_bounding_boxes({main()})
+# if __name__ == "__main__":
+#     Mapping.mapping_bounding_boxes({main()})
         
 
+lista_casas = ['a1','a3','a5','a7', \
+    'b2','b4', 'b6', 'b8', \
+    'c1','c3','c5','c7', \
+    'd2','d4', 'd6','d8', \
+    'e1','e3','e5', 'e7', \
+    'f2', 'f4', 'f6', 'f8', \
+    'g1', 'g3', 'g5', 'g7', \
+    'h2', 'h4', 'h6', 'h8']
 
 
-
-# n_digitos = 14
-# with open(f'docs/checkers_mapping.txt', 'w') as f:
-#     conteudo = 'Checkers mapped'
-#     for indice, casa in zip(range(32), mapeadas:
-#         conteudo += f'\n{casa}'
-#         for coordenada in mapeadas[indice]:
-#             conteudo += '  ' +str(round(coordenada, n_digitos))
-#     f.write(conteudo)
-
-        
+n_digitos = 5
+with open(f'docs/checkers_mapping.txt', 'w') as f:
+    conteudo = 'Checkers mapped'
+    for notacao_casa, casa in zip(lista_casas, mapeadas.values()):
+        conteudo += f'\n{notacao_casa}'
+        for coordenada in casa:
+            conteudo += '  ' +str(round(coordenada, n_digitos))
+    f.write(conteudo)
+    
 
