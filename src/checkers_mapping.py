@@ -43,7 +43,7 @@ class Mapping:
     @staticmethod
     def mapping_bounding_boxes(dict_yolo):
         for casa in mapeadas.values():
-            for chave, coordanada in casa:
+            for coordanada in casa:
                 for coordanadas_yolo in dict_yolo.values():
                     for coordenada_yolo in coordanadas_yolo:
                         if coordanada >= coordenada_yolo*0.9 and coordanada <= coordanadas_yolo*1.1:
