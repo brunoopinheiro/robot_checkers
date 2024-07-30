@@ -7,7 +7,7 @@ from capture.capture_module import CaptureModule
 def construct_robot_blueprint(
         robotcontroller: RobotController,
         model: Model,
-        capture_module: CaptureModule,
+        # capture_module: CaptureModule,
 ) -> Blueprint:
 
     robot_controller = Blueprint('robot_controller', __name__)
@@ -66,9 +66,11 @@ def construct_robot_blueprint(
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
         robotcontroller.to_upperboard()
+        capture_module = CaptureModule(1)
         img = capture_module.capture_opencv()
         print(img)
         print('Image successfully read.')
+        capture_module.video_capture.release()
         print('Calling the Model to detect pieces.')
         print('This may take a while, please wait...')
         result_dict = model.predict_from_opencv(img)

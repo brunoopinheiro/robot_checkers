@@ -26,8 +26,10 @@ class CaptureModule:
         os.makedirs(self.output_dir, exist_ok=True)
         sleep(5)
         if not self.video_capture.isOpened():
-            print('Cannot Open')
-            # raise SystemError("Cannot open camera")
+            # this should've been a raise
+            # but we explicitly choose to left it
+            # as a soft warning.
+            print('Cannot Open Camera')
 
     def capture_image(
             self,
