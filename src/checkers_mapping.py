@@ -1,4 +1,5 @@
-
+from neural_network.yolo_test import Model, cv2
+from neural_network.yolo_test import main
 
 
 # (piece) [x2, y1, x1, y2]
@@ -37,6 +38,22 @@ mapeadas = coordenadas(meu_dicionario)
 print(mapeadas)
 
 
+class Mapping:
+
+    @staticmethod
+    def mapping_bounding_boxes(dict_yolo):
+        for casa in mapeadas.values():
+            for chave, coordanada in casa:
+                for coordanadas_yolo in dict_yolo.values():
+                    for coordenada_yolo in coordanadas_yolo:
+                        if coordanada >= coordenada_yolo*0.9 and coordanada <= coordanadas_yolo*1.1:
+                            return coordanadas_yolo
+
+    
+    
+if __name__ == "__main__":
+    Mapping.mapping_bounding_boxes({main()})
+        
 
 
 
