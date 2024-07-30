@@ -1,10 +1,4 @@
-# from neural_network.yolo_test import Model, cv2
-# from neural_network.yolo_test import main
 
-""" 
-
-
-"""
 # (piece) [x2, y1, x1, y2]
 a1 = [450, 140, 400, 90]; a3 = [448, 240, 398, 190]; a5 = [446, 290, 396, 240]; a7 = [444, 390, 394, 340]
 b2 = [400, 191, 350, 141]; b4 = [398, 291, 348, 241]; b6 = [396, 391, 346, 341]; b8 = [394, 491, 344, 441]
@@ -39,22 +33,6 @@ def coordenadas(dicionario_casas):
 mapeadas = coordenadas(meu_dicionario)
 print(mapeadas)
 
-
-class Mapping:
-
-    @staticmethod
-    def mapping_bounding_boxes(dict_yolo):
-        for casa in mapeadas.values():
-            for coordanada in casa:
-                for coordanadas_yolo in dict_yolo.values():
-                    for coordenada_yolo in coordanadas_yolo:
-                        if coordanada >= coordenada_yolo*0.9 and coordanada <= coordanadas_yolo*1.1:
-                            return coordanadas_yolo
-
-    
-    
-# if __name__ == "__main__":
-#     Mapping.mapping_bounding_boxes({main()})
         
 
 lista_casas = ['a1','a3','a5','a7', \
@@ -69,7 +47,7 @@ lista_casas = ['a1','a3','a5','a7', \
 
 n_digitos = 5
 with open(f'docs/checkers_mapping.txt', 'w') as f:
-    conteudo = 'Checkers mapped'
+    conteudo = ''
     for notacao_casa, casa in zip(lista_casas, mapeadas.values()):
         conteudo += f'\n{notacao_casa}'
         for coordenada in casa:
