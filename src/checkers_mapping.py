@@ -1,17 +1,16 @@
-from math import pi, sin
 
 
 
 # (piece) [x2, y1, x1, y2]
-a1 = [552, 30, 502, 81]
-a3 = [0]*4; a5 = [0]*4; a7 = [0]*4
-b2 = [0]*4; b4 = [0]*4; b6 = [0]*4; b8 = [0]*4
-c1 = [0]*4; c3 = [0]*4; c5 = [0]*4; c7 = [0]*4
-d2 = [0]*4; d4 = [0]*4; d6 = [0]*4; d8 = [0]*4
-e1 = [0]*4; e3 = [0]*4; e5 = [0]*4; e7 = [0]*4
-f2 = [0]*4; f4 = [0]*4; f6 = [0]*4; f8 = [0]*4
-g1 = [0]*4; g3 = [0]*4; g5 = [0]*4; g7 = [0]*4
-h2 = [0]*4; h4 = [0]*4; h6 = [0]*4; h8 = [0]*4
+a1 = [450, 140, 400, 90]
+a3 = [450, 240, 400, 190]; a5 = [450, 290, 400, 240]; a7 = [450, 390, 400, 340]
+b2 = [400, 190, 350, 140]; b4 = [400, 290, 350, 240]; b6 = [400, 390, 350, 340]; b8 = [400, 490, 350, 440]
+c1 = [350, 140, 300, 90]; c3 = [350, 240, 300, 190]; c5 = [350, 290, 300, 240]; c7 = [350, 390, 300, 340]
+d2 = [300, 190, 250, 140]; d4 = [300, 290, 250, 240]; d6 = [300, 390, 250, 340]; d8 =[300, 490, 250, 440]
+e1 = [250, 140, 200, 90]; e3 = [250, 240, 200, 190]; e5 = [250, 340, 200, 290]; e7 = [250, 440, 200, 390]
+f2 = [200, 190, 150, 140]; f4 = [200, 290, 150, 240]; f6 = [200, 390, 150, 340]; f8 = [200, 490, 150, 440]
+g1 = [150, 140, 100, 90]; g3 = [150, 240, 100, 190]; g5 = [150, 340, 100, 290]; g7 = [150, 440, 100, 390]
+h2 = [100, 190, 150, 50]; h4 = [100, 290, 150, 150]; h6 = [100, 390, 150, 250]; h8 = [100, 490, 150, 350]
 
 
 
@@ -26,109 +25,26 @@ meu_dicionario = {
     'h2': h2, 'h4': h4, 'h6': h6, 'h8': h8
 }
 
-largura_horizontal = 553-153
-largura_vertical = 430-30
-degree_vertical = 90-88.69
-degree_horizonal = 180-178.16
 
-cateto_oposto_y = sin((pi/180)*degree_horizonal)*largura_horizontal
-
-cateto_oposto_x = sin((pi/180)*degree_vertical)*largura_vertical
-
-def coordenadas(casa_a1, dicionario_casas):
-    shift_x = 100
-    i = 1
-    for a in ['a3', 'a5', 'a7']:
-        dicionario_casas[a][0] = dicionario_casas['a1'][0]-shift_x*i
-        dicionario_casas[a][2] = dicionario_casas[a][0]-50
-        i += 1
-        dicionario_casas[a][1] = dicionario_casas['a1'][1]
-        dicionario_casas[a][3] = dicionario_casas['a1'][3] # Incluir o pequeno desvio
-        
-    for b, a in zip(['b2', 'b4', 'b6', 'b8'], ['a1','a3', 'a5', 'a7']):
-        if b == 'b8':
-            k = 50
-        else:
-            k = 0
-        dicionario_casas[b][0] = dicionario_casas[a][2]
-        dicionario_casas[b][2] = dicionario_casas[a][0]+k
-        
-        dicionario_casas[b][1] = dicionario_casas['a1'][1]+50
-        dicionario_casas[b][3] = dicionario_casas['a1'][3]+50 # Incluir o pequeno desvio
-        
-    
-    for c, b in zip(['c1', 'c3', 'c5', 'c7'], ['b2', 'b4', 'b6', 'b8']):
-        if c == 'c1':
-            dicionario_casas[c][0] = dicionario_casas[b][2]
-            dicionario_casas[c][2] = dicionario_casas[b][0]
-        else:
-            dicionario_casas[c][0] = dicionario_casas[b][2]
-            dicionario_casas[c][2] = dicionario_casas[b][0]
-            i += 1
-        dicionario_casas[c][1] = dicionario_casas[b][3]
-        dicionario_casas[c][3] = dicionario_casas[c][1]+50 # somar ou subtrai? Verificar a imagem
-        
-    for d, c in zip(['d2', 'd4', 'd6', 'd8'], ['c1', 'c3', 'c5', 'c7']):
-        if d == 'd8':
-            k = 50
-        else:
-            k = 0
-        dicionario_casas[d][0] = dicionario_casas[c][2]
-        dicionario_casas[d][2] = dicionario_casas[c][0]+k
-        
-        dicionario_casas[d][1] = dicionario_casas[c][3]
-        dicionario_casas[d][3] = dicionario_casas[d][1]+50
-        
-        
-    shift_x = 100
-    i = 1
-    for e, d in zip(['e1', 'e3', 'e5', 'e7'], ['d2', 'd4', 'd6', 'd8']):
-        dicionario_casas[e][0] = dicionario_casas[d][2]
-        dicionario_casas[e][2] = dicionario_casas[d][0]
-        
-        
-        
-    for f, e in zip(['f2', 'f4', 'f6', 'f8'], ['e1', 'e3', 'e5', 'e7']):
-        if f == 'f8':
-            k = 50
-        else:
-            k = 0
-        dicionario_casas[f][0] = dicionario_casas[e][2]
-        dicionario_casas[f][2] = dicionario_casas[e][0]+k
-    for g, f in zip(['g1', 'g3', 'g5', 'g7'], ['f2', 'f4', 'f6', 'f8']):
-        dicionario_casas[g][0] = dicionario_casas[f][2]
-        dicionario_casas[g][2] = dicionario_casas[f][0]
-    for g, h in zip(['g1', 'g3', 'g5', 'g7'], ['h2', 'h4', 'h6', 'h8']):
-        if h == 'h8':
-            k = 50
-        else:
-            k = 0
-        dicionario_casas[g][0] = dicionario_casas[h][2]
-        dicionario_casas[g][2] = dicionario_casas[h][0]+k
-    
-    
-    # for id, casa in dicionario_casas.items():
-    #     soma = sum(casa)
-    #     for indice in range(4):
-    #         casa[indice] = casa[indice]/soma
+def coordenadas(dicionario_casas):
+    for id, casa in dicionario_casas.items():
+        soma = sum(casa)
+        for indice in range(4):
+            casa[indice] = casa[indice]/soma
     return dicionario_casas
                     
-mapeadas = coordenadas(a1, meu_dicionario)
+mapeadas = coordenadas(meu_dicionario)
 print(mapeadas)
 
-dicionario_casas = ['a1', 'a3', 'a5', 'a7', \
-               ['b2', 'b4', 'b6', 'b8'], \
-                'c1', 'c3', 'c5', 'c7', \
-                'd2', 'd4', 'd6', 'd8', \
-                'e1', 'e3', 'e5', 'e7', \
-                'f2', 'f4', 'f6', 'f8', \
-                'g1', 'g3', 'g5', 'g7', \
-                'h2', 'h4', 'h6', 'h8', \
-    ]
+
+
+
+
+
 # n_digitos = 14
 # with open(f'docs/checkers_mapping.txt', 'w') as f:
 #     conteudo = 'Checkers mapped'
-#     for indice, casa in zip(range(32), dicionario_casas):
+#     for indice, casa in zip(range(32), mapeadas:
 #         conteudo += f'\n{casa}'
 #         for coordenada in mapeadas[indice]:
 #             conteudo += '  ' +str(round(coordenada, n_digitos))
