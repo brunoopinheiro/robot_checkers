@@ -22,6 +22,19 @@ Caso seja necessário atualizar o ambiente, basta executar o comando:
 conda env update -f dependencies/environment.yaml --prune
 ```
 
+## Gerando os arquivos Protobuf:
+Para executar o projeto, é necessário antes gerar os arquivos `protobuf` que serão utilizados na comunicação com a API. Para isso, basta caminhar no terminal até a pasta `proto`:
+
+```powershell
+cd .\src\api\proto\
+```
+
+E em seguida executar o comando:
+
+```powershell
+protoc -I . --python_betterproto_out=. .\messages.proto
+```
+
 ### Conectando com o Kinova
 
 Para conexão via cabo Ethernet com o Kinova, é necessário configurar o IP do computador para a faixa de IP do robô. Para isso, basta seguir os passos abaixo:
