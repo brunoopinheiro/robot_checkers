@@ -65,6 +65,28 @@ Foram mapeadas posições de movimentação geral do robô, bem como a posição
 | `dama0c` | Valores de posição das damas no formato `damaNC` onde `N = Numero` e `C = cor`. Valores de _z_ são referentes à posição rente ao tabuleiro. |
 | `dama0c_pregrip` | Valores de posição das damas no formato `damaNC_pregrip` onde `N = Numero` e `C = cor`. Valores de _z_ são referentes à altura antes da captura da peça. |
 
+## Executando o Projeto
+O backend do projeto integra a aplicação `Flask` com o orquestrador de controle do robô, o controle de câmera e a rede neural para identificação das peças no tabuleiro. Para executar o projeto, basta executar o arquivo `main.py` com o comando:
+
+```powershell
+python .\src\main.py
+```
+No entanto, vale ressaltar que o projeto permite a utilização de algumas variáveis de linha de comando para configuração da execução.
+
+| Argumento | Short | Descrição | Padrão | Opções |
+| :--- | :---: | :--- | :--- | :--- |
+| `--robot` | `-r` | Define o robô a ser utilizado. | `test` | `test`, `kinova` |
+| `--table` | `-t` | Define a mesa do robô a ser utilizada. | `1` | `1`, `2` |
+| `--debug` | `-d` | _Flag_ que define o modo de execução do projeto (Flask ou Waitress). | Waitress | Sem Argumento |
+
+### Exemplo de Execução
+Para executar o projeto com o robô **Kinova** na **Mesa 1** utilizando o **Flask** como servidor para debug, basta executar o comando:
+
+```powershell
+python .\src\main.py --robot kinova --table 1 -d
+```
+
+# Versões Anteriores
 ## Entregável Semana 1 - Scripts de Movimentação do Robô
 Para executar o projeto, basta executar o arquivo `main.py` com o comando:
 

@@ -2,13 +2,11 @@ from flask import Blueprint, jsonify, make_response
 from controller.robot_controller import RobotController
 from neural_network.model import Model
 from capture.capture_module import CaptureModule
-# from time import sleep
 
 
 def construct_robot_blueprint(
         robotcontroller: RobotController,
         model: Model,
-        # capture_module: CaptureModule,
 ) -> Blueprint:
 
     robot_controller = Blueprint('robot_controller', __name__)
@@ -20,19 +18,37 @@ def construct_robot_blueprint(
                 'title': 'Test Positions',
                 'route': '.../test_position/<pos_key>/<move_type>',
                 'http_method': 'GET',
-                'description': 'Allows to test bank positions for the robot.'
+                'desc': 'Allows to test bank positions for the robot.'
             },
             1: {
                 'title': 'Get Position',
                 'route': '.../position',
                 'http_method': 'GET',
-                'description': 'Retrieves the actual robot Joint and Pose.'
+                'desc': 'Retrieves the actual robot Joint and Pose.'
             },
             2: {
                 'title': 'Detect Board',
                 'route': '.../detect',
                 'http_method': 'GET',
-                'description': 'Requests the robot to detect the actual board.'
+                'desc': 'Requests the robot to detect the actual board.'
+            },
+            3: {
+                'title': 'Remove Piece',
+                'route': '.../remove_piece/<pos_key>',
+                'http_method': 'GET',
+                'desc': 'Requests the robot to remove a piece from the board.'
+            },
+            4: {
+                'title': 'Place Queen',
+                'route': '.../place_queen/<pos_key>/<queen_n>',
+                'http_method': 'GET',
+                'description': 'Requests the robot to place a queen.'
+            },
+            5: {
+                'title': 'Capture Movement',
+                'route': '.../capture/<pos_list>',
+                'http_method': 'GET',
+                'description': 'Requests the robot to move through the board.'
             },
         }), 200
 
@@ -64,6 +80,58 @@ def construct_robot_blueprint(
             print(err)
             return bad_response
 
+    @robot_controller.route('/remove_piece/<pos_key>', methods=['GET'])
+    def remove_piece(pos_key):
+        robotcontroller.to_upperboard()
+        try:
+            robotcontroller.remove_piece_from_board(pos_key)
+        except KeyError as err:
+            return jsonify({'Error': str(err)}), 400
+        finally:
+            robotcontroller.to_upperboard()
+        return jsonify({'ok': f'piece removed from {pos_key}'}), 200
+
+    @robot_controller.route('/place_queen/<pos_key>/<queen_n>')
+    def place_queen(pos_key, queen_n):
+        robotcontroller.to_upperboard()
+        try:
+            qn = int(queen_n)
+            robotcontroller.place_queen(
+                target_location=pos_key,
+                queen=qn,
+            )
+        except KeyError as err:
+            return jsonify({'Error': str(err)}), 400
+        except TypeError as err:
+            return jsonify({'Error': str(err), 'arg': queen_n}), 400
+        finally:
+            robotcontroller.to_upperboard()
+        return jsonify({'ok': f'Queen placed at {pos_key}'})
+
+    @robot_controller.route('/capture/<pos_list>', methods=['GET'])
+    def capture(pos_list):
+        robotcontroller.to_upperboard()
+        pos_list_keys = pos_list.lower().split(';')
+        if len(pos_list_keys) < 2:
+            err_dict = {
+                'Error': 'You must pass at least 2 positions',
+                'details': 'Each argument must be divided by ;'
+                }
+            return jsonify(err_dict), 400
+        valid = robotcontroller.check_valid_keys(*pos_list_keys)
+        if not valid:
+            return jsonify({'Error': 'Invalid positions'}), 400
+        try:
+            robotcontroller.capture_piece(
+                origin=pos_list_keys[0],
+                targets=pos_list_keys[1:],
+            )
+        except KeyError as err:
+            return jsonify({'Error': err}), 400
+        finally:
+            robotcontroller.to_upperboard()
+        return jsonify({'ok': 'Robot moved sucessfully'}), 200
+
     @robot_controller.route('/detect', methods=['GET'])
     def detect():
         robotcontroller.to_upperboard()
@@ -71,7 +139,6 @@ def construct_robot_blueprint(
         count = 0
         capture_module = CaptureModule(1)
         while img is None:
-            # sleep(3)
             img = capture_module.capture_opencv()
             print(img)
             print('Retrying... ', count)
