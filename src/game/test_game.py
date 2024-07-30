@@ -2,7 +2,7 @@ from checkers import Checkers
 from piece import Coordinates
 
 
-def main():
+def old_tests():
     game = Checkers()
     game.start_game()
     print('=== CHECKERS ===')
@@ -93,6 +93,13 @@ def main():
     )
     game._promote_piece(Coordinates('g', 1))
     game._promote_piece(Coordinates('h', 2))
+    game.board_state()
+
+
+def main():
+    game = Checkers()
+    game.start_game()
+    print('=== CHECKERS ===')
     game.board_state()
 
 
