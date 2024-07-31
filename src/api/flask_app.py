@@ -84,6 +84,7 @@ class FlaskApp:
 
     def _init_game(self, game_instance: Checkers) -> None:
         self._game = game_instance
+        self._game.start_game()
 
     def _get_game_instance(self) -> Optional[Checkers]:
         if self._game is None:

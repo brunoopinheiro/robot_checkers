@@ -70,7 +70,7 @@ class Board:
 
     def to_proto(self):
         rows = [
-            Row([sqr.to_proto() for sqr in board_row])
+            Row(squares=[sqr.to_proto() for sqr in board_row])
             for board_row in self.__board
         ]
         board = ProtoBoard(rows)

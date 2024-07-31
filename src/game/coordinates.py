@@ -25,10 +25,9 @@ class Coordinates:
         self.row += row_move
 
     def to_proto(self) -> ProtoCoords:
-        return ProtoCoords(
-            self.col,
-            self.row,
-        )
+        cl = self.col
+        rw = self.row
+        return ProtoCoords(cl, rw)
 
     def __iter__(self):
         return iter((self.col, self.row))

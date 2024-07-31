@@ -24,12 +24,16 @@ def construct_game_blueprint(
             }
         })
 
-    @game_controller.route('/start/<int:first_player>/<p1_color>/<p2_color>')
+    @game_controller.route(
+            '/start/<int:first_player>/<p1_color>/<p2_color>',
+            methods=['GET'],
+        )
     def start_game(
         first_player: int,
         p1_color: str,
         p2_color: str,
     ):
+        # convert to proto
         game_instance = get_game_instance()
         if game_instance is not None:
             return jsonify({'Error': 'Game already in progress'}), 400
@@ -46,12 +50,14 @@ def construct_game_blueprint(
         game_instance: Checkers = get_game_instance()
         if game_instance is None:
             return jsonify(GAME_NOT_STARTED), 404
+        game_instance.board_state()
         protogame = game_instance.proto_board()
         res = Response(bytes(protogame), status=200)
         return res
 
     @game_controller.route('/move_piece/<origin>/<destiny>', methods=['GET'])
     def move_piece(origin, destiny):
+        # convert to proto
         try:
             game_instance = get_game_instance()
             if game_instance is None:
@@ -79,6 +85,8 @@ def construct_game_blueprint(
         target,
         destiny,
     ):
+        # convert to proto
+        # integrate with multi jump
         try:
             game_instance = get_game_instance()
             if game_instance is None:
