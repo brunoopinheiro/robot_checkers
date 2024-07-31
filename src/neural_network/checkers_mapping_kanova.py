@@ -1,5 +1,4 @@
 
-# (piece) [x1, y1, x2, y2]
 a1 = [400, 90, 450, 140]; a3 = [398, 190, 448, 240]; a5 = [396, 240, 446, 290]; a7 = [394, 340, 444, 390]
 b2 = [350, 141, 400, 191]; b4 = [348, 241, 398, 291]; b6 = [346, 341, 396, 391]; b8 = [344, 441, 394, 491]
 c1 = [300, 92, 350, 142]; c3 = [348, 192, 298, 242]; c5 = [346, 242, 296, 292]; c7 = [344, 342, 294, 392]
@@ -11,7 +10,7 @@ h2 = [50, 147, 100, 197]; h4 = [48, 247, 98, 297]; h6 = [46, 347, 96, 397]; h8 =
 
 
 
-meu_dicionario = {
+dicionario_kAnova = {
     'a1': a1, 'a3': a3, 'a5': a5, 'a7': a7,
     'b2': b2, 'b4': b4, 'b6': b6, 'b8': b8,
     'c1': c1, 'c3': c3, 'c5': c5, 'c7': c7,
@@ -23,7 +22,7 @@ meu_dicionario = {
 }
 
 
-print(meu_dicionario)
+print(dicionario_kAnova)
 
 lista_casas = ['a1','a3','a5','a7', \
     'b2','b4', 'b6', 'b8', \
@@ -38,7 +37,7 @@ lista_casas = ['a1','a3','a5','a7', \
 n_digitos = 5
 with open(f'docs/checkers_mapping.txt', 'w') as f:
     conteudo = ''
-    for notacao_casa, casa in zip(lista_casas, meu_dicionario.values()):
+    for notacao_casa, casa in zip(lista_casas, dicionario_kAnova.values()):
         conteudo += f'\n{notacao_casa}'
         for coordenada in casa:
             conteudo += '  ' +str(round(coordenada, n_digitos))

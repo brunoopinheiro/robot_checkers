@@ -1,11 +1,11 @@
-def mapping_bounding_boxes(dict_yolo, mapped):
-    key, coordinates_yolo = dict_yolo.items()
-    for coordinates in mapped.values():
-        if all([([(coordinate_yolo[k] > coordinates[k]*0.8) or (coordinate_yolo[k] < coordinates[k]*1.2)] for coordinate_yolo in coordinates_yolo)] for k in range(4)):          
-            return coordinates_yolo[key]
+# def mapping_bounding_boxes(dict_yolo, mapped):
+#     key, coordinates_yolo = dict_yolo.items()
+#     for coordinates in mapped.values():
+#         if all([([(coordinate_yolo[k] > coordinates[k]*0.8) or (coordinate_yolo[k] < coordinates[k]*1.2)] for coordinate_yolo in coordinates_yolo)] for k in range(4)):          
+#             return coordinates_yolo[key]
         
 
-mapeadas = {'a1': [450, 140, 400, 90], 'a3': [448, 240, 398, 190], 'a5': [446, 290, 396, 240], 'a7': [444, 390, 394, 340], 
+mapeadas_kAnova = {'a1': [450, 140, 400, 90], 'a3': [448, 240, 398, 190], 'a5': [446, 290, 396, 240], 'a7': [444, 390, 394, 340], 
  'b2': [400, 191, 350, 141], 'b4': [398, 291, 348, 241], 'b6': [396, 391, 346, 341], 'b8': [394, 491, 344, 441], 
  'c1': [350, 142, 300, 92], 'c3': [348, 242, 298, 192], 'c5': [346, 292, 296, 242], 'c7': [344, 392, 294, 342], 
  'd2': [300, 193, 250, 143], 'd4': [298, 293, 248, 243], 'd6': [296, 393, 246, 343], 'd8': [294, 493, 244, 443], 
@@ -30,4 +30,4 @@ dicio = [{'name': 'green', 'class': 0, 'confidence': 0.94991, 'box': {'x1': 200.
         {'name': 'green', 'class': 0, 'confidence': 0.76707, 'box': {'x1': 202.10918, 'y1': 80.49863, 'x2': 241.90288, 'y2': 126.32437}}, 
         {'name': 'purple', 'class': 2, 'confidence': 0.73438, 'box': {'x1': 412.07346, 'y1': 82.1969, 'x2': 450.21158, 'y2': 127.39244}}]
 
-print(mapping_bounding_boxes(dicio, mapeadas))
+# print(mapping_bounding_boxes(dicio, mapeadas))

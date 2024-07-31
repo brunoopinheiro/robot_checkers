@@ -1,4 +1,4 @@
-from checkers_mapping import mapeadas
+from neural_network.checkers_mapping_kanova import mapeadas
 from yolo_test import main
 
 class Mapping:
