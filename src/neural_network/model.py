@@ -9,7 +9,7 @@ class YOLOModels(Enum):
 
     NANO_PRETRAINED = 'yolov8n.pt'
     SMALL_PRETRAINED = 'yolov8s.pt'
-    TRAINED = 'best.pt'
+    TRAINED = 'src/neural_network/best.pt'
 
 
 class Model:
