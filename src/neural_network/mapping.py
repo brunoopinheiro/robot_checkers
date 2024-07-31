@@ -1,19 +1,17 @@
 from checkers_mapping import mapeadas
 from yolo_test import main
+
 class Mapping:
 
     @staticmethod
     def mapping_bounding_boxes(dict_yolo):
-        for casa in mapeadas.values():
-            for coordanada in casa:
-                for coordanadas_yolo in dict_yolo.values():
-                    for coordenada_yolo in coordanadas_yolo:
-                        if coordanada >= coordenada_yolo*0.9 and coordanada <= coordanadas_yolo*1.1:
-                            return coordanadas_yolo
+        coordinates_yolo = dict_yolo.values() # assuming that dict_yolo == {key': [x2', y1', x1', y2'], key'': [x2'', y1'', x1'', y2''], ...} 
+        i1 = 0
+        for coordinates in mapeadas.values():
+            if all([([(coordinate_yolo[k] > coordinates[k]*0.8) or (coordinate_yolo[k] < coordinates[k]*1.2)] for coordinate_yolo in coordinates_yolo)] for k in range(4)):          
+                return coordinates_yolo[i1]
+            i1 += 1
 
 
-# Mapping.mapping_bounding_boxes({main()})
-# TypeError: unhashable type: 'list'  
-    
 # if __name__ == "__main__":
 #     Mapping.mapping_bounding_boxes({main()})
