@@ -1,6 +1,8 @@
 from checkers import Checkers
 from coordinates import Coordinates
 
+# This file should be deleted
+
 
 def next_player(player):
     if player == 1:

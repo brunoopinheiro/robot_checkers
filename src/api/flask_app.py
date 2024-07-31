@@ -1,7 +1,9 @@
+from typing import Optional
 from flask import Flask
 from waitress import serve
 from api.controllers.home_controller import construct_home_blueprint
 from api.controllers.robot_controller import construct_robot_blueprint
+from api.controllers.game_controller import construct_game_blueprint
 
 from controller.robot_controller import RobotController
 from robots.robot_enum import RobotEnum
@@ -12,6 +14,7 @@ from movebank.movebank import (
     RobotTableEnum,
 )
 from neural_network.model import Model
+from game.checkers import Checkers
 
 
 class FlaskApp:
@@ -28,6 +31,7 @@ class FlaskApp:
             table=table,
         )
         self._model = Model()
+        self._game: Optional[Checkers] = None
         self.__register_template()
         self.__register_blueprints()
         self._robot_controller.connect()
@@ -46,9 +50,17 @@ class FlaskApp:
             self._model,
         )
         home_controller = construct_home_blueprint()
+        game_controller = construct_game_blueprint(
+            self._init_game,
+            self._get_game_instance,
+        )
         self.__app.register_blueprint(
             robot_controller,
             url_prefix='/robot',
+        )
+        self.__app.register_blueprint(
+            game_controller,
+            url_prefix='/game',
         )
         self.__app.register_blueprint(
             home_controller,
@@ -69,6 +81,14 @@ class FlaskApp:
             robot=robot,
             movebank=MoveBank(table),
         )
+
+    def _init_game(self, game_instance: Checkers) -> None:
+        self._game = game_instance
+
+    def _get_game_instance(self) -> Optional[Checkers]:
+        if self._game is None:
+            return None
+        return self._game
 
     def debug_server(self) -> None:
         self.__app.run(

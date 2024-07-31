@@ -1,10 +1,11 @@
 from __future__ import annotations
 from typing import Optional
-from board import Board
-from piece import Coordinates, Piece
-from pawn import Pawn
-from queen import Queen
 from enum import Enum
+from game.board import Board
+from game.piece import Coordinates, Piece
+from game.pawn import Pawn
+from game.queen import Queen
+from proto.messages import Board as ProtoBoard
 
 
 OUT_OF_BOUNDS = "You've tried to go out of the board."
@@ -205,6 +206,9 @@ class Checkers:
 
     def board_state(self) -> None:
         self.__board.board_state()
+
+    def proto_board(self) -> ProtoBoard:
+        return self.__board.to_proto()
 
     def get_piece_by_coord(self, coord: Coordinates) -> Piece | None:
         for piece in self.p1_pieces:

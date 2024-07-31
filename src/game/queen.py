@@ -1,4 +1,8 @@
-from piece import Piece
+from game.piece import Piece
+from proto.messages import (
+    Piece as ProtoPiece,
+    PieceType,
+)
 
 
 class Queen(Piece):
@@ -10,3 +14,10 @@ class Queen(Piece):
     @property
     def jump_length(self) -> int:
         return 7
+
+    def to_proto(self) -> ProtoPiece:
+        return ProtoPiece(
+            self.coordinates.to_proto(),
+            self.color,
+            PieceType.QUEEN,
+        )
