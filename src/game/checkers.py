@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, List, Tuple
 from enum import Enum
 from game.board import Board
 from game.piece import Coordinates, Piece
@@ -272,6 +272,34 @@ class Checkers:
         self.__remove_piece(middle_piece.coordinates)
         self._update_draw_count()
         return True
+
+    def jump_multiple(
+            self,
+            origin: Coordinates,
+            jumps: List[Tuple[Coordinates, Coordinates]],
+    ) -> bool:
+        if self.__board.is_empty(origin):
+            return False
+        piece = self.get_piece_by_coord(origin)
+        for jump in jumps:
+            old_coords = piece.coordinates
+            target, destiny = jump
+            if not self.__board.is_empty(destiny):
+                # jump target occupied
+                return False
+            mid_piece = self.get_piece_by_coord(target)
+            if mid_piece is None:
+                return False
+            if piece.color == mid_piece.color:
+                # cannot jump over a piece of the same color
+                return False
+            if self._check_valid_jump(piece, destiny) is False:
+                return False
+            piece.move(destiny)
+            self._place_piece(piece, old_coords)
+            self.__remove_piece(mid_piece.coordinates)
+            self._update_draw_count()
+            return True
 
     def _promote_piece(
             self,
