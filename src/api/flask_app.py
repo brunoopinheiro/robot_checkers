@@ -33,7 +33,7 @@ class FlaskApp:
         self._model = Model()
         self._game: Optional[Checkers] = None
         self.__register_template()
-        self.__register_blueprints()
+        self.__register_blueprints(table)
         self._robot_controller.connect()
         if debug:
             self.debug_server()
@@ -44,10 +44,11 @@ class FlaskApp:
         self.__app.static_folder = 'views/static'
         self.__app.template_folder = 'views/template'
 
-    def __register_blueprints(self) -> None:
+    def __register_blueprints(self, table) -> None:
         robot_controller = construct_robot_blueprint(
             self._robot_controller,
             self._model,
+            table,
         )
         home_controller = construct_home_blueprint()
         game_controller = construct_game_blueprint(

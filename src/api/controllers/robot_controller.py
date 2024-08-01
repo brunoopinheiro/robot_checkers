@@ -7,6 +7,7 @@ from capture.capture_module import CaptureModule
 def construct_robot_blueprint(
         robotcontroller: RobotController,
         model: Model,
+        table: int,
 ) -> Blueprint:
 
     robot_controller = Blueprint('robot_controller', __name__)
@@ -148,10 +149,8 @@ def construct_robot_blueprint(
         capture_module.video_capture.release()
         print('Calling the Model to detect pieces.')
         print('This may take a while, please wait...')
-        result_dict = model.predict_from_opencv(img)
-        # This will change to protobuf once the translation
-        # between pixels and board squares is done.
-        return jsonify(result_dict), 200
+        predict_list = model.predict_from_opencv(img, table)
+        return jsonify(predict_list), 200
 
     @robot_controller.route('/disconnect', methods=['GET'])
     def to_disconnect():
