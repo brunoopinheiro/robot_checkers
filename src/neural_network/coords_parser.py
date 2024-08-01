@@ -132,14 +132,23 @@ class CoordsParser:
             raise SystemError('Detection Class Not Found')
 
     @staticmethod
+    def __filter_conf(input_list):
+        return list(filter(lambda x: x['confidence'], input_list))
+
+    @staticmethod
     def map_pieces(
-        input_dict,
+        input_list,
         refference_dict: RefferenceDict,
         tolerance: int = 25,
     ) -> List[DetectionPiece]:
         map_dict = CoordsParser.__get_dict(refference_dict)
         locations = []
-        for piece in input_dict:
+        print(input_list)
+        print(f'Old Input: {len(input_list)}')
+        confiable_detections = CoordsParser.__filter_conf(input_list)
+        print(confiable_detections)
+        print(f'Filtered: {len(confiable_detections)}')
+        for piece in confiable_detections:
             box_piece = piece['box']
             box_x1 = box_piece['x1']
             box_y1 = box_piece['y1']
@@ -179,7 +188,7 @@ class CoordsParser:
             elif not found and piece_type != PieceType.PAWN:
                 new_t = tolerance + 5
                 return CoordsParser.map_pieces(
-                    input_dict,
+                    confiable_detections,
                     refference_dict,
                     new_t,
                 )

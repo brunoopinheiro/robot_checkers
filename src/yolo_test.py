@@ -13,6 +13,7 @@ def main():
         RefferenceDict.KINOVA,
     )
     print(mapping)
+    print(f'LEN: {len(mapping)}')
 
 
 if __name__ == '__main__':
