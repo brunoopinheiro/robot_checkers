@@ -35,9 +35,9 @@ lista_casas = ['a1','a3','a5','a7', \
 
 
 n_digitos = 5
-with open(f'docs/checkers_mapping_kinova.txt', 'w') as f:
+with open(f'docs/checkers_mapping.txt', 'w') as f:
     conteudo = ''
-    for notacao_casa, casa in zip(lista_casas, dicionario_kinova.values()):
+    for notacao_casa, casa in zip(lista_casas, dicionario_kAnova.values()):
         conteudo += f'\n{notacao_casa}'
         for coordenada in casa:
             conteudo += '  ' +str(round(coordenada, n_digitos))

@@ -42,3 +42,4 @@ with open(f'docs/checkers_mapping_kinova.txt', 'w') as f:
         for coordenada in casa:
             conteudo += '  ' +str(round(coordenada, n_digitos))
     f.write(conteudo)
+    
