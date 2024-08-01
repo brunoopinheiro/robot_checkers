@@ -166,7 +166,11 @@ runs/*
 yolov8n.pt
 datasets/*
 !datasets/readme.md
+src/visao/*
 
 # Protobuf
 src/api/proto/*.py
 !src/api/proto/__init__.py
+
+# Others
+.history/
