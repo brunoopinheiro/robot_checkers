@@ -1,9 +1,11 @@
 from __future__ import annotations
-from board import Board
-from piece import Coordinates, Piece
-from pawn import Pawn
-from queen import Queen
+from typing import Optional, List, Tuple
 from enum import Enum
+from game.board import Board
+from game.piece import Coordinates, Piece
+from game.pawn import Pawn
+from game.queen import Queen
+from proto.messages import Board as ProtoBoard
 
 
 OUT_OF_BOUNDS = "You've tried to go out of the board."
@@ -25,58 +27,96 @@ class Checkers:
     __colmap: dict[str, int] = {val: idx
                                 for idx, val in enumerate(Board.columns)}
 
+    @property
+    def rounds(self) -> int:
+        return (self.__plays // 2) + 1
+
+    @property
+    def winner(self) -> Optional[int]:
+        return self.__winner
+
+    @property
+    def is_finished(self) -> bool:
+        return self.__isfinished
+
     def __new__(cls, *args, **kwargs) -> Checkers:
         if Checkers.__instance is None:
             Checkers.__instance = super(Checkers, cls).__new__(cls)
         return Checkers.__instance
 
     def __init__(
-        self,
+            self,
+            first_player: int,
+            player1_color: str,
+            player2_color: str,
     ) -> None:
         self.__board = Board()
         self.p1_pieces: list[Piece] = []
+        self.p1_queens = 0
         self.p2_pieces: list[Piece] = []
+        self.p2_queens = 0
+        self.__plays = 0
+        self.__draw_count = 0
+        self.__isfinished = False
+        self.__p1c = player1_color
+        self.__p2c = player2_color
+        self.__winner = None
+
+    def __geticon(self, color, queen=False) -> str:
+        if not queen:
+            if color == 'green':
+                return '🟢'
+            return '🟣'
+        if color == 'green':
+            return '❇️'
+        return '⚛️'
 
     def __initial_pieces(self) -> None:
         cols = Board.columns
+        p1icon = self.__geticon(self.__p1c)
+        p2icon = self.__geticon(self.__p2c)
         for i, c in enumerate(cols):
             if i % 2 == 0:
-                # 2 verde (1, 3), 1 roxa (7)
                 pg1 = Pawn(
                     coordinates=Coordinates(c, 1),
-                    color='green',
-                    icon='🟢',
+                    color=self.__p1c,
+                    icon=p1icon,
+                    promote_row=8,
                 )
                 pg2 = Pawn(
                     coordinates=Coordinates(c, 3),
-                    color='green',
-                    icon='🟢',
+                    color=self.__p1c,
+                    icon=p1icon,
+                    promote_row=8,
                 )
                 self.p1_pieces.append(pg1)
                 self.p1_pieces.append(pg2)
                 pp1 = Pawn(
                     coordinates=Coordinates(c, 7),
-                    color='purple',
-                    icon='🟣',
+                    color=self.__p2c,
+                    icon=p2icon,
+                    promote_row=1,
                 )
                 self.p2_pieces.append(pp1)
             else:
-                # 1 verde (2), 2 roxa (6, 8)
                 pg1 = Pawn(
                     coordinates=Coordinates(c, 2),
-                    color='green',
-                    icon='🟢',
+                    color=self.__p1c,
+                    icon=p1icon,
+                    promote_row=8,
                 )
                 self.p1_pieces.append(pg1)
                 pp1 = Pawn(
                     coordinates=Coordinates(c, 6),
-                    color='purple',
-                    icon='🟣',
+                    color=self.__p2c,
+                    icon=p2icon,
+                    promote_row=1,
                 )
                 pp2 = Pawn(
                     coordinates=Coordinates(c, 8),
-                    color='purple',
-                    icon='🟣',
+                    color=self.__p2c,
+                    icon=p2icon,
+                    promote_row=1,
                 )
                 self.p2_pieces.append(pp1)
                 self.p2_pieces.append(pp2)
@@ -90,12 +130,46 @@ class Checkers:
         c = (abs(a[0] - b[0]), abs(a[1] - b[1]))
         return max(c)
 
+    def check_endgame(self) -> None:
+        if len(self.p1_pieces) == 0:
+            self.__isfinished = True
+            self.__winner = 2
+        if len(self.p2_pieces) == 0:
+            self.__isfinished = True
+            self.__winner = 1
+        if self.__draw_count == 5:
+            self.is_finished = True
+            self.__winner = None
+
+    def _update_draw_count(self) -> None:
+        self.__plays += 1
+        cond_list = [
+            # Duas damas contra duas damas;
+            (self.p1_queens == 2 and self.p2_queens == 2),
+            # Duas damas contra uma;
+            # Uma dama contra uma dama e uma pedra.
+            (self.p1_queens == 2 and self.p2_queens == 1),
+            (self.p2_queens == 1 and self.p2_queens == 2),
+            # Duas damas contra uma dama e uma pedra;
+            (self.p1_queens == 2 and self.p2_pieces == 2),
+            (self.p1_pieces == 2 and self.p1_queens == 2),
+            # Uma dama contra uma dama;
+            (self.p1_queens == 1 and self.p2_queens == 1),
+        ]
+        if any(cond_list):
+            self.__draw_count += 1
+        else:
+            self.__draw_count = 0
+
     def _place_piece(
             self,
             piece: Piece,
             old_coords: Coordinates,
     ) -> None:
         self.__board.place_piece(piece, piece.coordinates, old_coords)
+        if (isinstance(piece, Pawn)
+                and piece.promote_row == piece.coordinates.row):
+            self._promote_piece(piece.coordinates)
 
     def _check_valid_move(
             self,
@@ -133,6 +207,9 @@ class Checkers:
     def board_state(self) -> None:
         self.__board.board_state()
 
+    def proto_board(self) -> ProtoBoard:
+        return self.__board.to_proto()
+
     def get_piece_by_coord(self, coord: Coordinates) -> Piece | None:
         for piece in self.p1_pieces:
             if piece.coordinates == coord:
@@ -147,17 +224,13 @@ class Checkers:
         for idx, piece in enumerate(self.p1_pieces):
             if piece.coordinates == piece_coordinates:
                 self.p1_pieces.pop(idx)
+                if isinstance(piece, Queen):
+                    self.p1_queens -= 1
         for idx, piece in enumerate(self.p2_pieces):
             if piece.coordinates == piece_coordinates:
                 self.p2_pieces.pop(idx)
-
-    def __swap_piece(self, new_piece: Piece) -> None:
-        for idx, piece in enumerate(self.p1_pieces):
-            if piece.coordinates == new_piece.coordinates:
-                self.p1_pieces[idx] = new_piece
-        for idx, piece in enumerate(self.p2_pieces):
-            if piece.coordinates == new_piece.coordinates:
-                self.p2_pieces[idx] = new_piece
+                if isinstance(piece, Queen):
+                    self.p2_queens -= 1
 
     def move_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
         try:
@@ -170,6 +243,7 @@ class Checkers:
                 return False
             piece.move(destiny)
             self._place_piece(piece, origin)
+            self._update_draw_count()
             return True
         except KeyError:
             print(OUT_OF_BOUNDS)
@@ -196,6 +270,35 @@ class Checkers:
         piece.move(destiny)
         self._place_piece(piece, origin)
         self.__remove_piece(middle_piece.coordinates)
+        self._update_draw_count()
+        return True
+
+    def jump_multiple(
+            self,
+            origin: Coordinates,
+            jumps: List[Tuple[Coordinates, Coordinates]],
+    ) -> bool:
+        if self.__board.is_empty(origin):
+            return False
+        piece = self.get_piece_by_coord(origin)
+        for jump in jumps:
+            old_coords = piece.coordinates
+            target, destiny = jump
+            if not self.__board.is_empty(destiny):
+                # jump target occupied
+                return False
+            mid_piece = self.get_piece_by_coord(target)
+            if mid_piece is None:
+                return False
+            if piece.color == mid_piece.color:
+                # cannot jump over a piece of the same color
+                return False
+            if self._check_valid_jump(piece, destiny) is False:
+                return False
+            piece.move(destiny)
+            self._place_piece(piece, old_coords)
+            self.__remove_piece(mid_piece.coordinates)
+        self._update_draw_count()
         return True
 
     def _promote_piece(
@@ -203,19 +306,20 @@ class Checkers:
             coordinates: Coordinates,
     ) -> Queen:
         piece = self.get_piece_by_coord(coordinates)
-        queen = None
-        if piece.color == 'green':
-            queen = Queen(
-                coordinates=piece.coordinates,
-                color=piece.color,
-                icon='❇️',
-            )
-        if piece.color == 'purple':
-            queen = Queen(
-                coordinates=piece.coordinates,
-                color=piece.color,
-                icon='⚛️'
-            )
+        icon = self.__geticon(
+            piece.color,
+            True,
+        )
+        queen = Queen(
+            coordinates=piece.coordinates,
+            color=piece.color,
+            icon=icon,
+        )
         self.__remove_piece(piece.coordinates)
+        if piece.color == self.__p1c:
+            self.p1_pieces.append(queen)
+            self.p1_queens += 1
+        else:
+            self.p2_pieces.append(queen)
+            self.p2_queens += 1
         self._place_piece(queen, queen.coordinates)
-        self.__swap_piece(queen)

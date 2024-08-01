@@ -3,7 +3,6 @@ from robots.pose import Pose
 from robots.joint import Joint
 from movebank.movebank import MoveBank
 from enum import Enum
-from capture.capture_module import CaptureModule
 
 
 MIDDLE_MOVE_HEIGHT = 'middle_move_height'
@@ -12,6 +11,7 @@ UPPER_DROP = 'upper_drop_height'
 QUEEN_STEP1 = 'queen_placement_middle'
 QUEEN_STEP2 = 'queen_placement_row8'
 UPPER_VIEW = 'upper_view_board'
+SAFE_SHUTDOWN = 'safe_shutdown'
 
 
 class _RoboStates(Enum):
@@ -43,12 +43,10 @@ class RobotController:
         self,
         robot: IRobot,
         movebank: MoveBank,
-        cam_index: int = 1,
     ) -> None:
         self.__robot = robot
         self.__movemap = movebank
         self.__state: _RoboStates = _RoboStates.UNDEFINED
-        self.__cam = CaptureModule(cam_index)
 
     def connect(self) -> None:
         """Stablishes the robot connection"""
@@ -73,6 +71,12 @@ class RobotController:
         )
         print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
+
+    def to_disconnect(self) -> None:
+        joints_ = self.move_map.get_joints(
+            key=SAFE_SHUTDOWN
+        )
+        self.robot.joint_move(joints_)
 
     def check_valid_keys(self, *args) -> bool:
         """Receives a variable number of map keys and checks
@@ -228,16 +232,7 @@ class RobotController:
         self.to_upperboard()
         self.robot.open_tool()
 
-    def read_board(self) -> None:
-        self.to_upperboard()
-        img = self.__cam.capture_opencv()
-        # We are still evaluating if the neural network model
-        # will be integrated to this class, or to the outter
-        # flask app. For now, we will only return the camera
-        # image to be used outside the class.
-        return img
-
-    def dataset_capture_position(self) -> None:
-        self.to_home()
-        self.to_upperboard()
-        self.__cam.capture_image()
+    # def dataset_capture_position(self) -> None:
+    #     self.to_home()
+    #     self.to_upperboard()
+    #     self.__cam.capture_image()

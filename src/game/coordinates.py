@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from proto.messages import Coordinates as ProtoCoords
 
 
 COLUMNS = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
@@ -22,6 +23,11 @@ class Coordinates:
                 idx -= 1
         self.col = COLUMNS[idx]
         self.row += row_move
+
+    def to_proto(self) -> ProtoCoords:
+        cl = self.col
+        rw = self.row
+        return ProtoCoords(cl, rw)
 
     def __iter__(self):
         return iter((self.col, self.row))

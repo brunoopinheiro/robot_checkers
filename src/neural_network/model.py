@@ -3,14 +3,13 @@ from PIL import Image, UnidentifiedImageError
 from enum import Enum
 from typing import Optional
 from json import loads
-from cv2.typing import MatLike
 
 
 class YOLOModels(Enum):
 
     NANO_PRETRAINED = 'yolov8n.pt'
     SMALL_PRETRAINED = 'yolov8s.pt'
-    TRAINED = 'best.pt'
+    TRAINED = 'src/neural_network/best.pt'
 
 
 class Model:
@@ -54,11 +53,11 @@ class Model:
             jsonr = r.tojson()
             print(jsonr)
 
-    def predict_from_opencv(self, cv_image: MatLike) -> dict:
+    def predict_from_opencv(self, cv_image) -> dict:
         # res will always be a list with one element
         res = self.__model.predict(
             source=cv_image,
-            show=False,
+            show=True,
             save=True,
             save_txt=True,
         )

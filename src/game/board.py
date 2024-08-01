@@ -1,5 +1,10 @@
 from dataclasses import dataclass
-from piece import Piece, Coordinates
+from game.piece import Piece, Coordinates
+from proto.messages import (
+    Square as ProtoSquare,
+    Row,
+    Board as ProtoBoard,
+)
 
 
 @dataclass
@@ -9,6 +14,17 @@ class Square:
     row: int
     movable: bool
     content: Piece
+
+    def to_proto(self) -> ProtoSquare:
+        ctnt = None
+        if self.content is not None:
+            ctnt = self.content.to_proto()
+        return ProtoSquare(
+            self.col,
+            self.row,
+            self.movable,
+            ctnt,
+        )
 
 
 class Board:
@@ -51,6 +67,14 @@ class Board:
             movable = False if movable is True else True
         self.__access = access_dict
         self.__board: list[list[Square]] = board
+
+    def to_proto(self):
+        rows = [
+            Row(squares=[sqr.to_proto() for sqr in board_row])
+            for board_row in self.__board
+        ]
+        board = ProtoBoard(rows)
+        return board
 
     def get_square(self, col: str, row: int):
         key = f'{row}{col}'.lower()

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from coordinates import Coordinates
+from game.coordinates import Coordinates
+from proto.messages import Piece
 
 
 class Piece(ABC):
@@ -49,4 +50,8 @@ class Piece(ABC):
     @property
     @abstractmethod
     def jump_length(self) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_proto(self) -> Piece:
         raise NotImplementedError
