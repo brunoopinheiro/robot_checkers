@@ -26,7 +26,7 @@ conda env update -f dependencies/environment.yaml --prune
 Para executar o projeto, é necessário antes gerar os arquivos `protobuf` que serão utilizados na comunicação com a API. Para isso, basta caminhar no terminal até a pasta `proto`:
 
 ```powershell
-cd .\src\api\proto\
+cd .\src\proto\
 ```
 
 E em seguida executar o comando:

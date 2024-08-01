@@ -19,7 +19,7 @@ class CaptureModule:
         # Pode mudar a câmera a partir do índice
         self.camera_index = camera_index
         self.video_capture = cv2.VideoCapture(
-            0,
+            camera_index,
             cv2.CAP_DSHOW,
         )
         self.output_dir = 'images'

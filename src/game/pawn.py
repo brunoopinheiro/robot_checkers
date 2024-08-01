@@ -1,5 +1,9 @@
-from coordinates import Coordinates
-from piece import Piece
+from game.coordinates import Coordinates
+from game.piece import Piece
+from proto.messages import (
+    Piece as ProtoPiece,
+    PieceType,
+)
 
 
 class Pawn(Piece):
@@ -25,3 +29,10 @@ class Pawn(Piece):
     @property
     def jump_length(self) -> int:
         return 2
+
+    def to_proto(self) -> ProtoPiece:
+        return ProtoPiece(
+            self.coordinates.to_proto(),
+            self.color,
+            PieceType.PAWN,
+        )

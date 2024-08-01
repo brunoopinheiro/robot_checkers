@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Optional
-from board import Board
-from piece import Coordinates, Piece
-from pawn import Pawn
-from queen import Queen
+from typing import Optional, List, Tuple
 from enum import Enum
+from game.board import Board
+from game.piece import Coordinates, Piece
+from game.pawn import Pawn
+from game.queen import Queen
+from proto.messages import Board as ProtoBoard
 
 
 OUT_OF_BOUNDS = "You've tried to go out of the board."
@@ -206,6 +207,9 @@ class Checkers:
     def board_state(self) -> None:
         self.__board.board_state()
 
+    def proto_board(self) -> ProtoBoard:
+        return self.__board.to_proto()
+
     def get_piece_by_coord(self, coord: Coordinates) -> Piece | None:
         for piece in self.p1_pieces:
             if piece.coordinates == coord:
@@ -266,6 +270,34 @@ class Checkers:
         piece.move(destiny)
         self._place_piece(piece, origin)
         self.__remove_piece(middle_piece.coordinates)
+        self._update_draw_count()
+        return True
+
+    def jump_multiple(
+            self,
+            origin: Coordinates,
+            jumps: List[Tuple[Coordinates, Coordinates]],
+    ) -> bool:
+        if self.__board.is_empty(origin):
+            return False
+        piece = self.get_piece_by_coord(origin)
+        for jump in jumps:
+            old_coords = piece.coordinates
+            target, destiny = jump
+            if not self.__board.is_empty(destiny):
+                # jump target occupied
+                return False
+            mid_piece = self.get_piece_by_coord(target)
+            if mid_piece is None:
+                return False
+            if piece.color == mid_piece.color:
+                # cannot jump over a piece of the same color
+                return False
+            if self._check_valid_jump(piece, destiny) is False:
+                return False
+            piece.move(destiny)
+            self._place_piece(piece, old_coords)
+            self.__remove_piece(mid_piece.coordinates)
         self._update_draw_count()
         return True
 
