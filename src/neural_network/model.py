@@ -3,6 +3,7 @@ from PIL import Image, UnidentifiedImageError
 from enum import Enum
 from typing import Optional
 from json import loads
+from neural_network.coords_parser import CoordsParser
 
 
 class YOLOModels(Enum):
@@ -53,7 +54,7 @@ class Model:
             jsonr = r.tojson()
             print(jsonr)
 
-    def predict_from_opencv(self, cv_image) -> dict:
+    def predict_from_opencv(self, cv_image, robot_ref: int):
         # res will always be a list with one element
         res = self.__model.predict(
             source=cv_image,
@@ -63,5 +64,6 @@ class Model:
         )
         r = res[0]
         jsonr = r.tojson()
-        resdict = loads(jsonr)
-        return resdict
+        reslist = loads(jsonr)
+        mapped_pieces = CoordsParser.map_pieces(reslist, robot_ref)
+        return mapped_pieces
