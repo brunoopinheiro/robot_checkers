@@ -298,8 +298,8 @@ class Checkers:
             piece.move(destiny)
             self._place_piece(piece, old_coords)
             self.__remove_piece(mid_piece.coordinates)
-            self._update_draw_count()
-            return True
+        self._update_draw_count()
+        return True
 
     def _promote_piece(
             self,
