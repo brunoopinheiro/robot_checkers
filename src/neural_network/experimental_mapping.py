@@ -3,7 +3,7 @@ from checkers_mapping_kinova import dicionario_kinova
 
 
 
-def mapping_bounding_box(dict_yolo, dict_checkers, tolerance=40):
+def mapping_bounding_box(dict_yolo, dict_checkers, tolerance=20):
     locations = []
     for piece in dict_yolo:
         box_piece = piece['box']
@@ -54,6 +54,8 @@ dict_yolo_example = [{'name': 'green', 'class': 0, 'confidence': 0.94991, 'box':
         {'name': 'purple', 'class': 2, 'confidence': 0.73438, 'box': {'x1': 412.07346, 'y1': 82.1969, 'x2': 450.21158, 'y2': 127.39244}}]
 
 
-res = mapping_bounding_box(dict_yolo_example, robot_board())
+dict_yolo_example_2 = [{'name': 'green_checker', 'class': 1, 'confidence': 0.86634, 'box': {'x1': 408.70679, 'y1': 147.30063, 'x2': 446.5553, 'y2': 187.47476}}, {'name': 'green', 'class': 0, 'confidence': 0.56452, 'box': {'x1': 97.49442, 'y1': 158.63623, 'x2': 134.08328, 'y2': 194.53259}}, {'name': 'purple', 'class': 2, 'confidence': 0.5429, 'box': {'x1': 210.00185, 'y1': 158.84821, 'x2': 241.61784, 'y2': 195.59714}}, {'name': 'green_checker', 'class': 1, 'confidence': 0.51236, 'box': {'x1': 311.31769, 'y1': 156.26598, 'x2': 340.07855, 'y2': 193.68617}}]
+
+res = mapping_bounding_box(dict_yolo_example_2, robot_board())
 for piece, square in res:
-    print(f"The piece {piece['name']} is placed in the square {square}")
+    print(f"The [piece: {piece['name']}, class: {piece['class']}, confidence: {piece['confidence']}] is placed in the square {square}")
