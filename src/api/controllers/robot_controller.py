@@ -148,7 +148,8 @@ def construct_robot_blueprint(
         robotcontroller.to_upperboard()
         img = None
         count = 0
-        capture_module = CaptureModule(1)
+        # ajustar para iniciar camera baseada no robo
+        capture_module = CaptureModule(0)
         while img is None:
             img = capture_module.capture_opencv()
             print(img)
@@ -160,7 +161,8 @@ def construct_robot_blueprint(
         print('Calling the Model to detect pieces.')
         print('This may take a while, please wait...')
         predict_list = model.predict_from_opencv(img, table)
-        return jsonify(predict_list), 200
+        print(predict_list)
+        return jsonify({'ok': 'ok'}), 200
 
     @robot_controller.route('/disconnect', methods=['GET'])
     def to_disconnect():
