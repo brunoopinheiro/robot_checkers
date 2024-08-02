@@ -12,6 +12,16 @@ def construct_robot_blueprint(
 
     robot_controller = Blueprint('robot_controller', __name__)
 
+    @robot_controller.before_request
+    def connect_robot():
+        robotcontroller.connect()
+
+    @robot_controller.after_request
+    def disconnect_robot(response):
+        robotcontroller.to_disconnect()
+        robotcontroller.disconnect()
+        return response
+
     @robot_controller.route('/help', methods=['GET'])
     def robot_methods():
         return jsonify({
@@ -138,7 +148,12 @@ def construct_robot_blueprint(
         robotcontroller.to_upperboard()
         img = None
         count = 0
-        capture_module = CaptureModule(1)
+        # Table: Kinova => 1; KAnova => 2
+        # Camera: Kinova => 0; KAnova => 1
+        cam_idx = 0
+        if robotcontroller.move_map.table == 2:
+            cam_idx = 1
+        capture_module = CaptureModule(cam_idx)
         while img is None:
             img = capture_module.capture_opencv()
             print(img)
@@ -150,7 +165,8 @@ def construct_robot_blueprint(
         print('Calling the Model to detect pieces.')
         print('This may take a while, please wait...')
         predict_list = model.predict_from_opencv(img, table)
-        return jsonify(predict_list), 200
+        print(predict_list)
+        return jsonify({'ok': 'ok'}), 200
 
     @robot_controller.route('/disconnect', methods=['GET'])
     def to_disconnect():

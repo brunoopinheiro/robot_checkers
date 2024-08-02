@@ -231,8 +231,3 @@ class RobotController:
         self._to_custom_pose(QUEEN_STEP2)
         self.to_upperboard()
         self.robot.open_tool()
-
-    # def dataset_capture_position(self) -> None:
-    #     self.to_home()
-    #     self.to_upperboard()
-    #     self.__cam.capture_image()
