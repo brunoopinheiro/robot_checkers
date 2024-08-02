@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Projeto - Kinova Checkers</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css')}}">
+</head>
+<body>
+  <header>
+    <h1>API - Documentação</h1>
+    <h3>Página em Desenvolvimento</h3>
+  </header>
+  <main>
+    <section>
+      <h3>GET Home</h3>
+      <p><i>Endpoint</i> inicial da API. Ainda sem conteúdo.</p>
+      <code>http://api_url/</code>
+      <h3>GET Docs</h3>
+      <p>Esse endpoint! :)</p>
+      <code>http://api_url/docs</code>
+    </section>
+    <section>
+        <h2>Robot</h2>
+        <p>Endpoints de controle direto do Robô. seguem a base <code>http://api_url/robot</code></p>
+        <h3>GET Help</h3>
+        <p>Retorna a lista de comandos disponíveis.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/help</code>
+        <h3>GET Position</h3>
+        <p>Retorna a posição atual do Robô em Juntas e em Cartesianos.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/position</code>
+        <h3>GET Test Position</h3>
+        <p>Move o robô até a posição informada através da url, no modo informado.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/test_position/:pos_key/:move_type</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>pos_key</td>
+            <td>Chave da posição a ser movida</td>
+          </tr>
+          <tr>
+            <td>move_type</td>
+            <td>Modo de movimentação: pode ser 'c' ou 'j' para <i>cartesian</i> ou <i>joints</i>.</td>
+          </tr>
+        </table>
+        <h3>GET Remove Piece</h3>
+        <p>Remove uma peça do tabuleiro.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/remove_piece/:pos_key</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>pos_key</td>
+            <td>Chave da posição a ser removida</td>
+          </tr>
+        </table>
+        <h3>GET Place Queen</h3>
+        <p>Coloca uma rainha no tabuleiro.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/place_queen/:pos_key/:queen_n</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>pos_key</td>
+            <td>Chave da posição a ser colocada</td>
+          </tr>
+          <tr>
+            <td>queen_n</td>
+            <td>Número da rainha a ser colocada</td>
+          </tr>
+        </table>
+        <h3>GET Capture</h3>
+        <p>Realiza a captura de uma peça.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/capture/:pos_list</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>pos_list</td>
+            <td>Lista de posições a serem capturadas</td>
+          </tr>
+        </table>
+        <h3>GET Detect</h3>
+        <p>Realiza a detecção de peças no tabuleiro.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/detect</code>
+        <h3>GET Disconnect</h3>
+        <p>Desconecta o Robô.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/robot/disconnect</code>
+    </section>
+    <section>
+        <h2>Game</h2>
+        <p>Endpoints de controle do jogo. seguem a base <code>http://api_url/game</code></p>
+        <h3>GET Help</h3>
+        <p>Retorna a lista de comandos disponíveis.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/game/help</code>
+        <h3>GET Start</h3>
+        <p>Inicia o jogo.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/game/start/:first_player/:p1_color/:p2_color</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>first_player</td>
+            <td>Primeiro jogador. Int: (0 ou 1)</td>
+          </tr>
+          <tr>
+            <td>p1_color</td>
+            <td>Cor das peças do jogador 1. String</td>
+          </tr>
+          <tr>
+            <td>p2_color</td>
+            <td>Cor das peças do jogador 2. String</td>
+          </tr>
+        </table>
+        <h3>GET State</h3>
+        <p>Retorna o estado atual do jogo.</p>
+        <p><b>Tipo de Retorno: </b>Protobuf</p>
+        <code>http://api_url/game/state</code>
+        <h3>GET Robot Play</h3>
+        <p>Realiza a jogada do robô.</p>
+        <p><b>Tipo de Retorno: </b>Protobuf</p>
+        <code>http://api_url/game/robot_play</code>
+        <h3>GET Move Piece</h3>
+        <p>Movimenta uma peça no tabuleiro.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/game/move_piece/:origin/:destiny</code>
+        <table>
+          <tr>
+            <th>Parâmetro</th>
+            <th>Descrição</th>
+          </tr>
+          <tr>
+            <td>origin</td>
+            <td>Posição de origem da peça</td>
+          </tr>
+          <tr>
+            <td>destiny</td>
+            <td>Posição de destino da peça</td>
+          </tr>
+        </table>
+        <h3>GET End</h3>
+        <p>Finaliza o jogo.</p>
+        <p><b>Tipo de Retorno: </b>JSON</p>
+        <code>http://api_url/game/end</code>
+    </section>
+  </main>
+  <!-- <footer>
+    <p>&copy; 2024 RRIA - Grupo 3. All rights reserved.</p>
+    <i>V 0.1.1</i>
+  </footer> -->
+</body>
+</html>

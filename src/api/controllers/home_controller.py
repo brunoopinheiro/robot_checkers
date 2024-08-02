@@ -13,4 +13,8 @@ def construct_home_blueprint() -> Blueprint:
     def index():
         return render_template('index.html')
 
+    @home_controller.route('/docs', methods=['GET'])
+    def api_docs():
+        return render_template('api_doc.html')
+
     return home_controller
