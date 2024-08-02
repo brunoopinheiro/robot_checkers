@@ -148,8 +148,12 @@ def construct_robot_blueprint(
         robotcontroller.to_upperboard()
         img = None
         count = 0
-        # ajustar para iniciar camera baseada no robo
-        capture_module = CaptureModule(0)
+        # Table: Kinova => 1; KAnova => 2
+        # Camera: Kinova => 0; KAnova => 1
+        cam_idx = 0
+        if robotcontroller.move_map.table == 2:
+            cam_idx = 1
+        capture_module = CaptureModule(cam_idx)
         while img is None:
             img = capture_module.capture_opencv()
             print(img)

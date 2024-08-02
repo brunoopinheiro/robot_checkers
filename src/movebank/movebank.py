@@ -18,6 +18,10 @@ class MoveBank:
     __instance = None
     fp = r"src\movebank\table"
 
+    @property
+    def table(self) -> int:
+        return self.__tkey
+
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
             cls.__instance = super(
