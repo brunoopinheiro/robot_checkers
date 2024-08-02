@@ -1,5 +1,6 @@
 from game.checkers import Checkers
 from game.coordinates import Coordinates
+from game.mocks.mock_init import FIRST_MOVE
 
 # This file should be deleted
 
@@ -101,5 +102,16 @@ def main():
             print('Winner: Player ', game.winner)
 
 
+def game_read():
+    game = Checkers(
+        first_player=0,
+        player1_color='purple',
+        player2_color='green'
+    )
+    game.start_game()
+    # TODO: game inferir jogada
+    game.board_state()
+
+
 if __name__ == '__main__':
-    main()
+    game_read()
