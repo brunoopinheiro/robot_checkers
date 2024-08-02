@@ -6,8 +6,8 @@ from enum import Enum
 
 class RobotTableEnum(Enum):
 
-    KINOVA = '_r1'
-    KANOVA = '_r2'
+    KINOVA = 1
+    KANOVA = 2
 
 
 class MoveBank:
@@ -16,7 +16,7 @@ class MoveBank:
     file."""
 
     __instance = None
-    filepath = r"src\movebank\positions_kinova.json"
+    fp = r"src\movebank\table"
 
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
@@ -29,20 +29,22 @@ class MoveBank:
             self,
             robot_table: RobotTableEnum = RobotTableEnum.KINOVA,
     ) -> None:
-        bankdict = self.__load_bank()
+        self.__tkey = robot_table.value
+        bankdict = self.__load_bank(self.__tkey)
         self.__bankdict = bankdict
-        self.__tablekey = robot_table.value
 
-    def __load_bank(self) -> dict[str, dict[str, list[float]]]:
+    def __load_bank(self, tkey: int) -> dict[str, dict[str, list[float]]]:
         """Loads the `MoveBank` from the json file."""
-        with open(MoveBank.filepath, 'r') as file:
+        filepath = f'{MoveBank.fp}{tkey}.json'
+        with open(filepath, 'r') as file:
             json_object = load(file)
             return json_object
 
     def __update_bank(self) -> None:
         """Updates the `.json` file used to populate the bank."""
+        filepath = f'{MoveBank.fp}{self.__tkey}.json'
         jsonstr = dumps(self.__bankdict, indent=4, sort_keys=True)
-        with open(MoveBank.filepath, 'w') as outfile:
+        with open(filepath, 'w') as outfile:
             outfile.write(jsonstr)
             print('File Updated')
 
@@ -54,7 +56,7 @@ class MoveBank:
     def get_cartesian(self, key: str) -> Pose:
         """Gets the cartesian reference of a given key."""
         if len(key) == 2:
-            key = f'{key}{self.__tablekey}'
+            key = f'{key}'
         if key in self.__bankdict:
             str_list = self.__bankdict[key]['cartesian']
             float_list = self.__str_to_floatlist(str_list)
