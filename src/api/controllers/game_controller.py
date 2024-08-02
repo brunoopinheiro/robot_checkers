@@ -9,6 +9,7 @@ GAME_NOT_STARTED = {'404': 'Game not started.'}
 def construct_game_blueprint(
         init_game_function,
         get_game_instance,
+        eng_game_function,
 ) -> Blueprint:
 
     game_controller = Blueprint('game_controller', __name__)
@@ -39,13 +40,13 @@ def construct_game_blueprint(
             return jsonify({'Error': 'Game already in progress'}), 400
         game = Checkers(
             first_player=first_player,
-            player1_color=p1_color,
-            player2_color=p2_color,
+            player1_color=p1_color.lower(),
+            player2_color=p2_color.lower(),
         )
         init_game_function(game)
         return jsonify({'ok': 'game started'}), 200
 
-    @game_controller.route('/game_state')
+    @game_controller.route('/state')
     def game_state():
         game_instance: Checkers = get_game_instance()
         if game_instance is None:
@@ -76,7 +77,7 @@ def construct_game_blueprint(
             )
             return jsonify({'ok': 'Piece moved.'}), 200
         except Exception as err:
-            print('Error: ', err)
+            print('Error:', err)
             return jsonify({'Error': f'{err}'}), 500
 
     @game_controller.route('/single_jump/<origin>/<target>/<destiny>')
@@ -109,6 +110,15 @@ def construct_game_blueprint(
                 target_coord,
             )
             return jsonify({'ok': 'Jump executed successfully.'}), 200
+        except Exception as err:
+            print('Error: ', err)
+            return jsonify({'Error': f'{err}'}), 500
+
+    @game_controller.route('/end', methods=['GET'])
+    def end_game():
+        try:
+            results = eng_game_function()
+            return jsonify(results), 200
         except Exception as err:
             print('Error: ', err)
             return jsonify({'Error': f'{err}'}), 500

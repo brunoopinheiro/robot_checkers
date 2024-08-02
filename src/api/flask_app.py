@@ -34,7 +34,6 @@ class FlaskApp:
         self._game: Optional[Checkers] = None
         self.__register_template()
         self.__register_blueprints(table)
-        self._robot_controller.connect()
         if debug:
             self.debug_server()
         else:
@@ -54,6 +53,7 @@ class FlaskApp:
         game_controller = construct_game_blueprint(
             self._init_game,
             self._get_game_instance,
+            self._end_game,
         )
         self.__app.register_blueprint(
             robot_controller,
@@ -91,6 +91,29 @@ class FlaskApp:
         if self._game is None:
             return None
         return self._game
+
+    def _end_game(self) -> dict:
+        winner = self._game.winner
+        rounds = self._game.rounds
+
+        results = {
+            'Winner': f'{winner}',
+            'Rounds': rounds,
+            'players': {
+                '1': {
+                    'pieces_left': len(self._game.p1_pieces),
+                    'queens': self._game.p1_queens,
+                    'color': self._game.p1_pieces[0].color
+                },
+                '2': {
+                    'pieces_left': len(self._game.p2_pieces),
+                    'queens': self._game.p2_queens,
+                    'color': self._game.p2_pieces[0].color
+                }
+            }
+        }
+        self._game = None
+        return results
 
     def debug_server(self) -> None:
         self.__app.run(

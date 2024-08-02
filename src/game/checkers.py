@@ -58,16 +58,17 @@ class Checkers:
         self.__plays = 0
         self.__draw_count = 0
         self.__isfinished = False
-        self.__p1c = player1_color
-        self.__p2c = player2_color
+        self.__p1c = player1_color.lower()
+        self.__p2c = player2_color.lower()
         self.__winner = None
 
     def __geticon(self, color, queen=False) -> str:
+        green = ('green', 'g', 'verde', 'v')
         if not queen:
-            if color == 'green':
+            if color.lower() in green:
                 return '🟢'
             return '🟣'
-        if color == 'green':
+        if color.lower() in green:
             return '❇️'
         return '⚛️'
 

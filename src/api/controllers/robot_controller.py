@@ -12,6 +12,16 @@ def construct_robot_blueprint(
 
     robot_controller = Blueprint('robot_controller', __name__)
 
+    @robot_controller.before_request
+    def connect_robot():
+        robotcontroller.connect()
+
+    @robot_controller.after_request
+    def disconnect_robot(response):
+        robotcontroller.to_disconnect()
+        robotcontroller.disconnect()
+        return response
+
     @robot_controller.route('/help', methods=['GET'])
     def robot_methods():
         return jsonify({
