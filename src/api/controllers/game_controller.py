@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, Response
 from game.checkers import Checkers
 from game.coordinates import Coordinates
+from controller.robot_controller import RobotController
 
 
 GAME_NOT_STARTED = {'404': 'Game not started.'}
@@ -10,9 +11,28 @@ def construct_game_blueprint(
         init_game_function,
         get_game_instance,
         eng_game_function,
+        robotcontroller: RobotController,
 ) -> Blueprint:
 
     game_controller = Blueprint('game_controller', __name__)
+
+    def __getprotoboard():
+        game_instance: Checkers = get_game_instance()
+        if game_instance is None:
+            return jsonify(GAME_NOT_STARTED), 404
+        game_instance.board_state()
+        protogame = game_instance.proto_board()
+        return protogame
+
+    @game_controller.before_request
+    def connect_robot():
+        robotcontroller.connect()
+
+    @game_controller.after_request
+    def disconnect_robot(response):
+        robotcontroller.to_disconnect()
+        robotcontroller.disconnect()
+        return response
 
     @game_controller.route('/help', methods=['GET'])
     def game_routes():
@@ -48,11 +68,14 @@ def construct_game_blueprint(
 
     @game_controller.route('/state')
     def game_state():
-        game_instance: Checkers = get_game_instance()
-        if game_instance is None:
-            return jsonify(GAME_NOT_STARTED), 404
-        game_instance.board_state()
-        protogame = game_instance.proto_board()
+        protogame = __getprotoboard()
+        res = Response(bytes(protogame), status=200)
+        return res
+
+    @game_controller.route('/robot_play', methods=['GET'])
+    def robot_play():
+        print('This robot doesnt know how to decide its play yet.')
+        protogame = __getprotoboard()
         res = Response(bytes(protogame), status=200)
         return res
 

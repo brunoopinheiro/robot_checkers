@@ -54,6 +54,7 @@ class FlaskApp:
             self._init_game,
             self._get_game_instance,
             self._end_game,
+            self._robot_controller,
         )
         self.__app.register_blueprint(
             robot_controller,
