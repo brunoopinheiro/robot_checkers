@@ -1,6 +1,7 @@
 from game.checkers import Checkers
 from game.coordinates import Coordinates
-from game.mocks.mock_init import FIRST_MOVE
+from game.mocks.mock_init import FIRST_MOVE, THIRD_MOVE
+from neural_network.game_ai import GameAI, GameAIResult, GameAIResultType
 
 # This file should be deleted
 
@@ -102,14 +103,45 @@ def main():
             print('Winner: Player ', game.winner)
 
 
+def play_move(game_ai_result: GameAIResult, game: Checkers):
+    if game_ai_result.result_type == GameAIResultType.MOVE:
+        game.move_piece(
+            game_ai_result.origin,
+            game_ai_result.destiny,
+        )
+    if game_ai_result.result_type == GameAIResultType.JUMP:
+        game.jump_multiple(
+            game_ai_result.origin,
+            game_ai_result.target,
+        )
+
+
 def game_read():
     game = Checkers(
         first_player=0,
-        player1_color='purple',
-        player2_color='green'
+        player1_color='green',
+        player2_color='purple'
     )
     game.start_game()
-    # TODO: game inferir jogada
+    last_play = GameAI.detect_play(
+        game._board,
+        game.p1_pieces,
+        game.p2_pieces,
+        FIRST_MOVE,
+    )
+    play_move(last_play, game)
+    game.move_piece(
+        Coordinates('d', 6),
+        Coordinates('c', 5),
+    )
+    last_play = GameAI.detect_play(
+        game._board,
+        game.p1_pieces,
+        game.p2_pieces,
+        THIRD_MOVE,
+    )
+    print(last_play)
+    play_move(last_play, game)
     game.board_state()
 
 

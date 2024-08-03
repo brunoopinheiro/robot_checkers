@@ -50,7 +50,7 @@ class Checkers:
             player1_color: str,
             player2_color: str,
     ) -> None:
-        self.__board = Board()
+        self._board = Board()
         self.p1_pieces: list[Piece] = []
         self.p1_queens = 0
         self.p2_pieces: list[Piece] = []
@@ -167,7 +167,7 @@ class Checkers:
             piece: Piece,
             old_coords: Coordinates,
     ) -> None:
-        self.__board.place_piece(piece, piece.coordinates, old_coords)
+        self._board.place_piece(piece, piece.coordinates, old_coords)
         if (isinstance(piece, Pawn)
                 and piece.promote_row == piece.coordinates.row):
             self._promote_piece(piece.coordinates)
@@ -206,10 +206,10 @@ class Checkers:
             self._place_piece(piece2, piece2.coordinates)
 
     def board_state(self) -> None:
-        self.__board.board_state()
+        self._board.board_state()
 
     def proto_board(self) -> ProtoBoard:
-        return self.__board.to_proto()
+        return self._board.to_proto()
 
     def get_piece_by_coord(self, coord: Coordinates) -> Piece | None:
         for piece in self.p1_pieces:
@@ -221,7 +221,7 @@ class Checkers:
         return None
 
     def __remove_piece(self, piece_coordinates: Coordinates) -> bool:
-        self.__board.remove_piece(piece_coordinates)
+        self._board.remove_piece(piece_coordinates)
         for idx, piece in enumerate(self.p1_pieces):
             if piece.coordinates == piece_coordinates:
                 self.p1_pieces.pop(idx)
@@ -235,9 +235,9 @@ class Checkers:
 
     def move_piece(self, origin: Coordinates, destiny: Coordinates) -> bool:
         try:
-            if self.__board.is_empty(origin):
+            if self._board.is_empty(origin):
                 return False
-            if not self.__board.is_empty(destiny):
+            if not self._board.is_empty(destiny):
                 return False
             piece = self.get_piece_by_coord(origin)
             if self._check_valid_move(piece, destiny) is False:
@@ -256,9 +256,9 @@ class Checkers:
             destiny: Coordinates,
             target_piece: Coordinates,
     ) -> bool:
-        if self.__board.is_empty(origin):
+        if self._board.is_empty(origin):
             return False
-        if not self.__board.is_empty(destiny):
+        if not self._board.is_empty(destiny):
             return False
         piece = self.get_piece_by_coord(origin)
         middle_piece = self.get_piece_by_coord(target_piece)
@@ -279,13 +279,16 @@ class Checkers:
             origin: Coordinates,
             jumps: List[Tuple[Coordinates, Coordinates]],
     ) -> bool:
-        if self.__board.is_empty(origin):
+        # TODO: A pedra que durante o lance de captura
+        # de várias peças, apenas passe por qualquer
+        # casa de coroação, sem lá parar, não será promovida à dama.
+        if self._board.is_empty(origin):
             return False
         piece = self.get_piece_by_coord(origin)
         for jump in jumps:
             old_coords = piece.coordinates
             target, destiny = jump
-            if not self.__board.is_empty(destiny):
+            if not self._board.is_empty(destiny):
                 # jump target occupied
                 return False
             mid_piece = self.get_piece_by_coord(target)
