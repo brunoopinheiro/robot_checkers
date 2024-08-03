@@ -1,28 +1,9 @@
-from typing import List, Tuple
-from game.board import Board, Coordinates
+from typing import List
+from game.checkers import Checkers
 from game.piece import Piece
-from neural_network.coords_parser import DetectionPiece
-from dataclasses import dataclass
-from enum import Enum, auto
-
-
-class GameAIResultType(Enum):
-
-    MOVE = auto()
-    JUMP = auto()
-
-
-@dataclass
-class GameAIResult:
-
-    # tipo jogada (move, jump)
-    result_type: GameAIResultType
-    # origin
-    origin: Coordinates
-    # destiny
-    destiny: Coordinates
-    # target (nullable)
-    target: List[Tuple[Coordinates, Coordinates]]
+from game.pawn import Pawn
+from game.queen import Queen
+from neural_network.coords_parser import DetectionPiece, PieceType
 
 
 class GameAI:
@@ -63,114 +44,6 @@ class GameAI:
     }
 
     @staticmethod
-    def __detect_move(
-        board: Board,
-        pieces_list: List[DetectionPiece],
-    ):
-        moved = None
-        i = 0
-        while moved is None and i < len(pieces_list):
-            d_piece = pieces_list[i]
-            if board.is_empty(d_piece.coords):
-                moved = d_piece
-            i += 1
-        # from adjacent squares, what is not there anymore
-        key = f'{moved.coords.col}{moved.coords.row}'
-        adjs = GameAI.adjascent_squares.get(key)
-        for coord in adjs:
-            cd = Coordinates(coord[0], int(coord[1]))
-            if not board.is_empty(cd):
-                return GameAIResult(
-                    result_type=GameAIResultType.MOVE,
-                    origin=cd,
-                    destiny=d_piece.coords,
-                    target=[],
-                )
-
-    @staticmethod
-    def __find_jumper(
-        board: Board,
-        pieces_list: List[DetectionPiece],
-        color: str,
-    ) -> Coordinates:
-        """This Represents the coordinates
-        of the piece after all the jumps."""
-        moved = None
-        i = 0
-        while moved is None and i < len(pieces_list):
-            d_piece = pieces_list[i]
-            if d_piece.color == color and board.is_empty(d_piece.coords):
-                moved = d_piece
-            i += 1
-        return d_piece.coords
-
-    @staticmethod
-    def __detect_jump(
-        jumps: int,
-        p1_pieces: List[Piece],
-        p2_pieces: List[Piece],
-        board: Board,
-        pieces_list: List[DetectionPiece],
-    ):
-        p1color = p1_pieces[0].color
-        p2color = p2_pieces[0].color
-        countp1 = 0
-        for d_piece in pieces_list:
-            if d_piece.color == p1color:
-                countp1 += 1
-        destiny = None
-        if countp1 < len(p1_pieces):
-            # this means p2 executed the jumps
-            # find the piece who moved
-            destiny = GameAI.__find_jumper(
-                board,
-                pieces_list,
-                p2color,
-            )
-        else:
-            # p1 executed the jumps
-            # find the piece who moved
-            destiny = GameAI.__find_jumper(
-                board,
-                pieces_list,
-                p1color,
-            )
-        # it had an adjascent adversary with an empty square next to it
-        # repeat by the number o jumps
-        list_jumps = [None] * jumps
-        origin = None
-        i = 0
-        while i < jumps:
-            i += 1
-            key = f'{destiny.col}{destiny.row}'
-            adjs = GameAI.adjascent_squares.get(key)
-            for coord in adjs:
-                cd = Coordinates(coord[0], int(coord[1]))
-                if not board.is_empty(cd):
-                    # check if coord adj is empty
-                    target = cd
-                    tkey = f'{target.col}{target.row}'
-                    tadjs = GameAI.adjascent_squares.get(tkey)
-                    for tcoord in tadjs:
-                        tcd = Coordinates(tcoord[0], int(tcoord[1]))
-                        if i == jumps:
-                            if not board.is_empty(tcd):
-                                origin = tcd
-                                list_jumps[i-1] = (target, destiny)
-                                destiny = origin
-                        else:
-                            if board.is_empty(tcd):  # missing one validation
-                                origin = tcd
-                                list_jumps[i-1] = (target, destiny)
-                                destiny = origin
-        return GameAIResult(
-            result_type=GameAIResultType.JUMP,
-            origin=origin,
-            destiny=destiny,
-            target=list_jumps,
-        )
-
-    @staticmethod
     def filter_outerboard(
         pieces_list: List[DetectionPiece],
     ) -> List[DetectionPiece]:
@@ -182,26 +55,28 @@ class GameAI:
         ]
 
     @staticmethod
-    def detect_play(
-        board: Board,
-        p1_pieces: List[Piece],
-        p2_pieces: List[Piece],
-        pieces_list: List[DetectionPiece],
-    ) -> GameAIResult:
-        filtered_pieces = GameAI.filter_outerboard(pieces_list)
-        new_count = len(filtered_pieces)
-        old_count = (len(p1_pieces) + len(p2_pieces))
-        if new_count == old_count:
-            return GameAI.__detect_move(
-                board,
-                filtered_pieces,
-            )
-        if new_count < old_count:
-            jumps = old_count - new_count
-            return GameAI.__detect_jump(
-                jumps,
-                p1_pieces,
-                p2_pieces,
-                board,
-                filtered_pieces,
-            )
+    def detection_to_gamepieces(
+            pieces_list: List[DetectionPiece],
+            game: Checkers,
+    ) -> List[Piece]:
+        filtered_list = GameAI.filter_outerboard(pieces_list)
+        pieces = [None] * len(filtered_list)
+        i = 0
+        for i in range(len(filtered_list)):
+            p = filtered_list[i]
+            if p.piece_type == PieceType.PAWN:
+                new_piece = Pawn(
+                    color=p.color,
+                    coordinates=p.coords,
+                    icon=game._geticon(p.color),
+                    promote_row=game._getpromote(p.color),
+                )
+                pieces[i] = new_piece
+            if p.piece_type == PieceType.QUEEN:
+                new_piece = Queen(
+                    color=p.color,
+                    coordinates=p.coords,
+                    icon=game._geticon(p.color, True),
+                )
+                pieces[i] = new_piece
+        return pieces

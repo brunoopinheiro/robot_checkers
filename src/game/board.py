@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 from game.piece import Piece, Coordinates
 from proto.messages import (
     Square as ProtoSquare,
@@ -108,3 +109,17 @@ class Board:
         if self.__board[c][r].content is None:
             return True
         return False
+
+    def __clear_board(self) -> None:
+        for key in self.__access.keys():
+            i, j = self.get_square(key[1], int(key[0]))
+            self.__board[i][j].content = None
+
+    def overwrite_board(self, pieces_list: List[Piece]):
+        self.__clear_board()
+        for piece in pieces_list:
+            i, j = self.get_square(
+                piece.coordinates.col,
+                piece.coordinates.row,
+            )
+            self.__board[i][j].content = piece

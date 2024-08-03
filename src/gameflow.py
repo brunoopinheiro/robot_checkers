@@ -1,8 +1,7 @@
 from game.checkers import Checkers
 from game.coordinates import Coordinates
 from game.mocks.mock_init import FIRST_MOVE, THIRD_MOVE
-from neural_network.game_ai import GameAI, GameAIResult, GameAIResultType
-
+from neural_network.game_ai import GameAI
 # This file should be deleted
 
 
@@ -103,19 +102,6 @@ def main():
             print('Winner: Player ', game.winner)
 
 
-def play_move(game_ai_result: GameAIResult, game: Checkers):
-    if game_ai_result.result_type == GameAIResultType.MOVE:
-        game.move_piece(
-            game_ai_result.origin,
-            game_ai_result.destiny,
-        )
-    if game_ai_result.result_type == GameAIResultType.JUMP:
-        game.jump_multiple(
-            game_ai_result.origin,
-            game_ai_result.target,
-        )
-
-
 def game_read():
     game = Checkers(
         first_player=0,
@@ -123,27 +109,19 @@ def game_read():
         player2_color='purple'
     )
     game.start_game()
-    last_play = GameAI.detect_play(
-        game._board,
-        game.p1_pieces,
-        game.p2_pieces,
-        FIRST_MOVE,
-    )
-    play_move(last_play, game)
-    game.move_piece(
-        Coordinates('d', 6),
-        Coordinates('c', 5),
-    )
-    last_play = GameAI.detect_play(
-        game._board,
-        game.p1_pieces,
-        game.p2_pieces,
-        THIRD_MOVE,
-    )
-    print(last_play)
-    play_move(last_play, game)
+    pieces_list = GameAI.detection_to_gamepieces(FIRST_MOVE, game)
+    game.overwrite_board(pieces_list)
     game.board_state()
+    pieces_list = GameAI.detection_to_gamepieces(THIRD_MOVE, game)
+    game.overwrite_board(pieces_list)
+    game.board_state()
+    print('Rounds: ', game.rounds)
+    print('Finished: ', game.is_finished)
+    print('Winnder: ', game.winner)
+    print('P1 Queens: ', game.p1_queens)
+    print('P2 Queens: ', game.p2_queens)
 
 
 if __name__ == '__main__':
+    # main()
     game_read()

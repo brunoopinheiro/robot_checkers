@@ -39,6 +39,14 @@ class Checkers:
     def is_finished(self) -> bool:
         return self.__isfinished
 
+    @property
+    def p1_promote_row(self) -> int:
+        return 8
+
+    @property
+    def p2_promote_row(self) -> int:
+        return 1
+
     def __new__(cls, *args, **kwargs) -> Checkers:
         if Checkers.__instance is None:
             Checkers.__instance = super(Checkers, cls).__new__(cls)
@@ -62,7 +70,7 @@ class Checkers:
         self.__p2c = player2_color.lower()
         self.__winner = None
 
-    def __geticon(self, color, queen=False) -> str:
+    def _geticon(self, color, queen=False) -> str:
         green = ('green', 'g', 'verde', 'v')
         if not queen:
             if color.lower() in green:
@@ -72,10 +80,16 @@ class Checkers:
             return '❇️'
         return '⚛️'
 
+    def _getpromote(self, color: str) -> int:
+        if color == self.__p1c:
+            return self.p1_promote_row
+        if color == self.__p2c:
+            return self.p2_promote_row
+
     def __initial_pieces(self) -> None:
         cols = Board.columns
-        p1icon = self.__geticon(self.__p1c)
-        p2icon = self.__geticon(self.__p2c)
+        p1icon = self._geticon(self.__p1c)
+        p2icon = self._geticon(self.__p2c)
         for i, c in enumerate(cols):
             if i % 2 == 0:
                 pg1 = Pawn(
@@ -127,7 +141,6 @@ class Checkers:
         d_col, d_row = destiny
         a: tuple[int, int] = (Checkers.__colmap[o_col], o_row)
         b: tuple[int, int] = (Checkers.__colmap[d_col], d_row)
-        print(a, b)
         c = (abs(a[0] - b[0]), abs(a[1] - b[1]))
         return max(c)
 
@@ -310,7 +323,7 @@ class Checkers:
             coordinates: Coordinates,
     ) -> Queen:
         piece = self.get_piece_by_coord(coordinates)
-        icon = self.__geticon(
+        icon = self._geticon(
             piece.color,
             True,
         )
@@ -327,3 +340,23 @@ class Checkers:
             self.p2_pieces.append(queen)
             self.p2_queens += 1
         self._place_piece(queen, queen.coordinates)
+
+    def overwrite_board(
+            self,
+            pieces_list: List[Piece],  # filtered by GameAI
+    ):
+        p1_pieces = []
+        p2_pieces = []
+        self.p1_queens = 0
+        self.p2_queens = 0
+        for piece in pieces_list:
+            if piece.color == self.__p1c:
+                p1_pieces.append(piece)
+                if isinstance(piece, Queen):
+                    self.p1_queens += 1
+            else:
+                p2_pieces.append(piece)
+                if isinstance(piece, Queen):
+                    self.p2_queens += 1
+        self._board.overwrite_board(pieces_list)
+        self._update_draw_count()
