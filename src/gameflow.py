@@ -115,6 +115,8 @@ def game_read():
     pieces_list = GameAI.detection_to_gamepieces(THIRD_MOVE, game)
     game.overwrite_board(pieces_list)
     game.board_state()
+    gameai = GameAI('green', 'purple')
+    gameai.evaluate_moves(game, True)
     print('Rounds: ', game.rounds)
     print('Finished: ', game.is_finished)
     print('Winnder: ', game.winner)
@@ -122,6 +124,12 @@ def game_read():
     print('P2 Queens: ', game.p2_queens)
 
 
+def test_moves():
+    available_moves = GameAI.move_left('e3', 7, backwards=True)
+    print(available_moves)
+
+
 if __name__ == '__main__':
     # main()
     game_read()
+    # test_moves()

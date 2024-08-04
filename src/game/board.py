@@ -123,3 +123,20 @@ class Board:
                 piece.coordinates.row,
             )
             self.__board[i][j].content = piece
+
+    def _validate_capture(
+            self,
+            origin_coordinates: Coordinates,
+            target_coordinates: Coordinates,
+    ) -> bool:
+        o_col, o_row = origin_coordinates
+        t_col, t_row = target_coordinates
+        o_c, o_r = self.get_square(o_col, o_row)
+        t_c, t_r = self.get_square(t_col, t_row)
+        origin = self.__board[o_c][o_r]
+        target = self.__board[t_c][t_r]
+        if (origin.content is not None
+                and target.content is not None
+                and origin.content.color != target.content.color):
+            return True
+        return False

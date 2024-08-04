@@ -66,8 +66,8 @@ class Checkers:
         self.__plays = 0
         self.__draw_count = 0
         self.__isfinished = False
-        self.__p1c = player1_color.lower()
-        self.__p2c = player2_color.lower()
+        self._p1c = player1_color.lower()
+        self._p2c = player2_color.lower()
         self.__winner = None
 
     def _geticon(self, color, queen=False) -> str:
@@ -81,26 +81,32 @@ class Checkers:
         return '⚛️'
 
     def _getpromote(self, color: str) -> int:
-        if color == self.__p1c:
+        if color == self._p1c:
             return self.p1_promote_row
-        if color == self.__p2c:
+        if color == self._p2c:
             return self.p2_promote_row
+
+    def _getpiece_by_color(self, color: str) -> list[Piece]:
+        if color == self._p1c:
+            return self.p1_pieces
+        if color == self._p2c:
+            return self.p2_pieces
 
     def __initial_pieces(self) -> None:
         cols = Board.columns
-        p1icon = self._geticon(self.__p1c)
-        p2icon = self._geticon(self.__p2c)
+        p1icon = self._geticon(self._p1c)
+        p2icon = self._geticon(self._p2c)
         for i, c in enumerate(cols):
             if i % 2 == 0:
                 pg1 = Pawn(
                     coordinates=Coordinates(c, 1),
-                    color=self.__p1c,
+                    color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
                 pg2 = Pawn(
                     coordinates=Coordinates(c, 3),
-                    color=self.__p1c,
+                    color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
@@ -108,7 +114,7 @@ class Checkers:
                 self.p1_pieces.append(pg2)
                 pp1 = Pawn(
                     coordinates=Coordinates(c, 7),
-                    color=self.__p2c,
+                    color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
@@ -116,20 +122,20 @@ class Checkers:
             else:
                 pg1 = Pawn(
                     coordinates=Coordinates(c, 2),
-                    color=self.__p1c,
+                    color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
                 self.p1_pieces.append(pg1)
                 pp1 = Pawn(
                     coordinates=Coordinates(c, 6),
-                    color=self.__p2c,
+                    color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
                 pp2 = Pawn(
                     coordinates=Coordinates(c, 8),
-                    color=self.__p2c,
+                    color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
@@ -333,7 +339,7 @@ class Checkers:
             icon=icon,
         )
         self.__remove_piece(piece.coordinates)
-        if piece.color == self.__p1c:
+        if piece.color == self._p1c:
             self.p1_pieces.append(queen)
             self.p1_queens += 1
         else:
@@ -350,7 +356,7 @@ class Checkers:
         self.p1_queens = 0
         self.p2_queens = 0
         for piece in pieces_list:
-            if piece.color == self.__p1c:
+            if piece.color == self._p1c:
                 p1_pieces.append(piece)
                 if isinstance(piece, Queen):
                     self.p1_queens += 1
@@ -359,4 +365,6 @@ class Checkers:
                 if isinstance(piece, Queen):
                     self.p2_queens += 1
         self._board.overwrite_board(pieces_list)
+        self.p1_pieces = p1_pieces
+        self.p2_pieces = p2_pieces
         self._update_draw_count()
