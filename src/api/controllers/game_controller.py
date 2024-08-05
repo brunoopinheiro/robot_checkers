@@ -71,6 +71,17 @@ def construct_game_blueprint(
         protogame = __getprotoboard()
         res = Response(bytes(protogame), status=200)
         return res
+    
+    @game_controller.route('/check_winner', methods=['GET'])
+    def check_winner():
+        game_instance: Checkers = get_game_instance()
+        if game_instance is None:
+            return jsonify(GAME_NOT_STARTED), 404
+        if game_instance.is_finished:
+            return jsonify({'winner': f'{game_instance.winner}'}), 200
+        else:
+            return jsonify({'winner': None}), 204
+
 
     @game_controller.route('/robot_play', methods=['GET'])
     def robot_play():
