@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, Response
 from game.checkers import Checkers
 from game.coordinates import Coordinates
 from controller.robot_controller import RobotController
-
+from capture.capture_module import CaptureModule
+from neural_network.model import Model
+from neural_network.game_ai import GameAI
 
 GAME_NOT_STARTED = {'404': 'Game not started.'}
 
@@ -12,6 +14,7 @@ def construct_game_blueprint(
         get_game_instance,
         eng_game_function,
         robotcontroller: RobotController,
+        model: Model,
 ) -> Blueprint:
 
     game_controller = Blueprint('game_controller', __name__)
@@ -74,7 +77,32 @@ def construct_game_blueprint(
 
     @game_controller.route('/robot_play', methods=['GET'])
     def robot_play():
-        print('This robot doesnt know how to decide its play yet.')
+        # go to upperview
+        game_instance: Checkers = get_game_instance()
+        if game_instance is None:
+            return jsonify(GAME_NOT_STARTED), 404
+        robotcontroller.to_upperboard()
+        img = None
+        count = 0
+        cam_idx = 0
+        table = robotcontroller.move_map.table
+        if table == 2:
+            cam_idx = 1
+        capture_module = CaptureModule(cam_idx)
+        while img is None:
+            img = capture_module.capture_opencv()
+            count += 1
+            if count == 10:
+                return jsonify({'Error', 'Could not capture a picture'}), 500
+        capture_module.video_capture.release()
+        print('This may take a while, please wait...')
+        # detect board, update board
+        predict_list = model.predict_from_opencv(img, table)
+        # decide play
+        pieces_list = GameAI.detection_to_gamepieces(predict_list, game_instance)
+        game_instance.overwrite_board(pieces_list)
+        # play
+        # return board as proto
         protogame = __getprotoboard()
         res = Response(bytes(protogame), status=200)
         return res
