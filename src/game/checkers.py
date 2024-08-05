@@ -47,6 +47,14 @@ class Checkers:
     def p2_promote_row(self) -> int:
         return 1
 
+    @property
+    def human_color(self) -> str:
+        return self._p1c
+
+    @property
+    def robot_color(self) -> str:
+        return self._p2c
+
     def __new__(cls, *args, **kwargs) -> Checkers:
         if Checkers.__instance is None:
             Checkers.__instance = super(Checkers, cls).__new__(cls)
@@ -55,8 +63,8 @@ class Checkers:
     def __init__(
             self,
             first_player: int,
-            player1_color: str,
-            player2_color: str,
+            human_color: str,
+            robot_color: str,
     ) -> None:
         self._board = Board()
         self.p1_pieces: list[Piece] = []
@@ -66,8 +74,8 @@ class Checkers:
         self.__plays = 0
         self.__draw_count = 0
         self.__isfinished = False
-        self._p1c = player1_color.lower()
-        self._p2c = player2_color.lower()
+        self._p1c = robot_color.lower()
+        self._p2c = human_color.lower()
         self.__winner = None
 
     def _geticon(self, color, queen=False) -> str:

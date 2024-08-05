@@ -42,20 +42,20 @@ def construct_game_blueprint(
         return jsonify({
             0: {
                 'title': 'Start Game',
-                'route': '../start/<int:first_player>/<p1_color>/<p2_color>',
+                'route': '../start/<int:robot>/<p1_color>/<p2_color>',
                 'http_method': 'GET',
                 'desc': 'Starts a checkers game.',
             }
         })
 
     @game_controller.route(
-            '/start/<int:first_player>/<p1_color>/<p2_color>',
+            '/start/<int:robot>/<p1_color>/<p2_color>',
             methods=['GET'],
         )
     def start_game(
         first_player: int,
-        p1_color: str,
-        p2_color: str,
+        human_color: str,
+        robot_color: str,
     ):
         # convert to proto
         game_instance = get_game_instance()
@@ -63,8 +63,8 @@ def construct_game_blueprint(
             return jsonify({'Error': 'Game already in progress'}), 400
         game = Checkers(
             first_player=first_player,
-            player1_color=p1_color.lower(),
-            player2_color=p2_color.lower(),
+            human_color=human_color.lower(),
+            robot_color=robot_color.lower(),
         )
         init_game_function(game)
         return jsonify({'ok': 'game started'}), 200
@@ -99,9 +99,17 @@ def construct_game_blueprint(
         # detect board, update board
         predict_list = model.predict_from_opencv(img, table)
         # decide play
-        pieces_list = GameAI.detection_to_gamepieces(predict_list, game_instance)
+        pieces_list = GameAI.detection_to_gamepieces(
+            predict_list,
+            game_instance,
+        )
         game_instance.overwrite_board(pieces_list)
         # play
+        gameai = GameAI(
+            robot=game_instance.robot_color,
+            adv=game_instance.human_color,
+        )
+        next_play = gameai.evaluate_moves(game_instance)
         # return board as proto
         protogame = __getprotoboard()
         res = Response(bytes(protogame), status=200)

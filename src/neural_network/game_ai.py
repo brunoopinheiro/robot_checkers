@@ -157,11 +157,38 @@ class GameAI:
         target_coord = Coordinates(target[0], int(target[1]))
         return board._validate_capture(origin_coord, target_coord)
 
+    def __find_captures(
+            self,
+            board: Board,
+            origin: str,
+            piece: Piece,
+            captures: List[Tuple[str, str]] = None,
+    ) -> List[Tuple[str, str]]:
+        if captures is None:
+            captures = []
+        piece_color = piece.color
+        lgt = piece.move_length
+        coords = f'{piece.coordinates.col}{piece.coordinates.row}'
+        # dada uma posição inicial
+        # encontrar todas as peços inimigas em distânica de pulo
+        left_fwd = GameAI.move_left(coords, lgt)
+        right_fwd = GameAI.move_right(coords, lgt)
+        left_bwd = GameAI.move_left(coords, lgt, True)
+        right_bwd = GameAI.move_left(coords, lgt, True)
+        # para cada peça inimiga em distância de pulo,
+        # verificar se há espaço em branco depois da peça
+
+        # repetir até que não haja peça para pular ou espaço atrás
+        # verificar se essa opção é mais longa que a atualmente mais longa
+        # alterar referência da mais longa caso necessário
+        pass
+
     def __get_queen_moves(
             self,
             board: Board,
-            coordinates: Coordinates,
-    ) -> Tuple[List[str], List[str]]:
+            piece: Queen,
+    ) -> Tuple[List[str], List[List[str]]]:
+        coordinates = piece.coordinates
         coords = f'{coordinates.col}{coordinates.row}'
         left_fwd = GameAI.move_left(coords, 7)
         right_fwd = GameAI.move_right(coords, 7)
@@ -177,6 +204,7 @@ class GameAI:
                 if board.is_empty(move_list[i]):
                     movements.append(move_list[i])
                 else:
+                    # Adjust this board.is_empty() params
                     if i < maxidx and board.is_empty(move_list[i + 1]):
                         valid = self.__validate_capture(
                             board,
@@ -184,7 +212,12 @@ class GameAI:
                             move_list[i + 1],
                         )
                         if valid:
-                            captures.append(move_list[i + 1])
+                            capt = self.__find_captures(
+                                board,
+                                origin=move_list[i],
+                                piece=piece,
+                            )
+                            captures.append(capt)
                         else:
                             _stop = True
                     i += 1
@@ -194,9 +227,10 @@ class GameAI:
     def __get_pawn_moves(
             self,
             board: Board,
-            coordinates: Coordinates,
+            piece: Pawn,
             endboard: bool = False,
     ) -> Tuple[List[str], List[str]]:
+        coordinates = piece.coordinates
         coords = f'{coordinates.col}{coordinates.row}'
         left_fwd = GameAI.move_left(coords, 1, endboard)
         right_fwd = GameAI.move_right(coords, 1, endboard)
@@ -217,7 +251,12 @@ class GameAI:
                             move_list[i + 1],
                         )
                         if valid:
-                            captures.append(move_list[i + 1])
+                            capt = self.__find_captures(
+                                board,
+                                origin=move_list[i],
+                                piece=piece,
+                            )
+                            captures.append(capt)
                         else:
                             _stop = True
                         i += 1
@@ -238,8 +277,6 @@ class GameAI:
     def evaluate_moves(self, game: Checkers, robot: bool = True):
         board = game._board
         pieces = []
-        inverted = self.__robotcolor != game._p1c
-        print('Inverted: ', inverted)
         if robot:
             pieces = game._getpiece_by_color(self.__robotcolor)
         else:
@@ -250,13 +287,12 @@ class GameAI:
             if isinstance(piece, Queen):
                 moves, captures = self.__get_queen_moves(
                     board,
-                    piece.coordinates,
+                    piece,
                 )
             else:
                 moves, captures = self.__get_pawn_moves(
                     board,
-                    piece.coordinates,
-                    inverted,
+                    piece,
                 )
             # In Priority Order:
             # 1. Capture
