@@ -15,6 +15,7 @@ def construct_robot_blueprint(
     @robot_controller.before_request
     def connect_robot():
         robotcontroller.connect()
+        robotcontroller.robot.open_tool()
 
     @robot_controller.after_request
     def disconnect_robot(response):
@@ -83,12 +84,11 @@ def construct_robot_blueprint(
                 200,
             )
             return response
-        except KeyError as err:
+        except KeyError:
             bad_response = make_response(
                 f'Key {pos_key} of type {move_type} not found',
                 400,
             )
-            print(err)
             return bad_response
 
     @robot_controller.route('/remove_piece/<pos_key>', methods=['GET'])
@@ -156,17 +156,11 @@ def construct_robot_blueprint(
         capture_module = CaptureModule(cam_idx)
         while img is None:
             img = capture_module.capture_opencv()
-            print(img)
-            print('Retrying... ', count)
             # TODO: find a way to kill a running instance of a singleton
             count += 1
-        print('Image successfully read.')
         capture_module.video_capture.release()
-        print('Calling the Model to detect pieces.')
-        print('This may take a while, please wait...')
         predict_list = model.predict_from_opencv(img, table)
-        print(predict_list)
-        return jsonify({'ok': 'ok'}), 200
+        return jsonify({'ok': predict_list}), 200
 
     @robot_controller.route('/disconnect', methods=['GET'])
     def to_disconnect():

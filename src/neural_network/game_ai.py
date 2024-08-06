@@ -116,14 +116,16 @@ class GameAI:
             pos_key = None
             if backwards and sqr not in (7, 15, 23, 31, 39, 47, 55, 63):
                 pos = sqr - 8 + 1
-                pos_key, playble = GameAI.board_as_int[pos]
-                if playble:
-                    available_moves.append(pos_key)
+                if pos >= 0 and pos <= 63:
+                    pos_key, playble = GameAI.board_as_int[pos]
+                    if playble:
+                        available_moves.append(pos_key)
             elif not backwards and sqr < 55 and sqr % 8 != 0:
                 pos = sqr + 8 + 1
-                pos_key, playble = GameAI.board_as_int[pos]
-                if playble:
-                    available_moves.append(pos_key)
+                if pos >= 0 and pos <= 63:
+                    pos_key, playble = GameAI.board_as_int[pos]
+                    if playble:
+                        available_moves.append(pos_key)
             if pos_key is not None:
                 sqr = GameAI._square_to_int(pos_key)
             i -= 1
@@ -142,14 +144,16 @@ class GameAI:
             pos_key = None
             if backwards and sqr < 56 and (sqr + 1) % 8 != 0:
                 pos = sqr - 8 - 1
-                pos_key, playble = GameAI.board_as_int[pos]
-                if playble:
-                    available_moves.append(pos_key)
+                if pos >= 0 and pos <= 63:
+                    pos_key, playable = GameAI.board_as_int[pos]
+                    if playable:
+                        available_moves.append(pos_key)
             elif not backwards and sqr < 55 and (sqr + 1) % 8 != 0:
                 pos = sqr + 8 - 1
-                pos_key, playble = GameAI.board_as_int[pos]
-                if playble:
-                    available_moves.append(pos_key)
+                if pos >= 0 and pos <= 63:
+                    pos_key, playable = GameAI.board_as_int[pos]
+                    if playable:
+                        available_moves.append(pos_key)
             if pos_key is not None:
                 sqr = GameAI._square_to_int(pos_key)
             i -= 1
@@ -270,7 +274,7 @@ class GameAI:
             self,
             board: Board,
             piece: Pawn,
-            endboard: bool = True,
+            endboard: bool = False,
     ) -> List[str]:
         coordinates = piece.coordinates
         coords = f'{coordinates.col}{coordinates.row}'
@@ -293,11 +297,12 @@ class GameAI:
 
     def evaluate_moves(self, game: Checkers, robot: bool = True):
         board = game._board
-        pieces = []
-        if robot:
-            pieces = game._getpiece_by_color(self.__robotcolor)
-        else:
-            pieces = game._getpiece_by_color(self.__advcolor)
+        # pieces = []
+        # if robot:
+        #     pieces = game._getpiece_by_color(self.__robotcolor)
+        # else:
+        #     pieces = game._getpiece_by_color(self.__advcolor)
+        pieces = game._getpiece_by_color(self.__advcolor)
         print('2 - Pieces Obtained')
         for piece in pieces:
             coords = f'{piece.coordinates.col}{piece.coordinates.row}'
