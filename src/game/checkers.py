@@ -97,7 +97,7 @@ class Checkers:
     def _getpiece_by_color(self, color: str) -> list[Piece]:
         if color == self._p1c:
             return self.p1_pieces
-        if color == self._p2c:
+        else:
             return self.p2_pieces
 
     def __initial_pieces(self) -> None:

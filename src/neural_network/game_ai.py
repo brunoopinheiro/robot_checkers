@@ -1,10 +1,17 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from game.checkers import Checkers
 from game.board import Board, Coordinates
 from game.piece import Piece
 from game.pawn import Pawn
 from game.queen import Queen
 from neural_network.coords_parser import DetectionPiece, PieceType
+from neural_network.results.game_ai_result import (
+    GameAIResult,
+    GameAIResultType,
+    Jump,
+)
+from neural_network.capture_tree.tree import Tree, Node
+from random import choice
 
 
 class GameAI:
@@ -83,11 +90,12 @@ class GameAI:
             self,
             robot: str,
             adv: str,
-            max_depth: int = 3,
     ) -> None:
         self.__robotcolor = robot
         self.__advcolor = adv
-        self.__max_depth = max_depth
+        self.captree: Optional[Tree] = None
+        self.deepest_capt_value = 0
+        self.deepest_capt: List[Node] = []
 
     @staticmethod
     def _square_to_int(square: str) -> int:
@@ -147,47 +155,98 @@ class GameAI:
             i -= 1
         return available_moves
 
-    def __validate_capture(
+    def __capture_result(self) -> GameAIResult:
+        origin_ref = self.deepest_capt[0].target
+        origin = Coordinates(origin_ref[0], int(origin_ref[1]))
+        size = (len(self.deepest_capt)-2)
+        jumps = [None] * size
+        i = 0
+        while i < size:
+            jump_node = self.deepest_capt[i+1]
+            tgt = jump_node.target
+            dt = jump_node.destiny
+            target = Coordinates(tgt[0], int(tgt[1]))
+            destiny = Coordinates(dt[0], int(dt[1]))
+            jump = Jump(target, destiny)
+            jumps[i] = jump
+        return GameAIResult(
+            play_type=GameAIResultType.CAPTURE,
+            origin=origin,
+            jumps=jumps,
+            destiny=None
+        )
+
+    def __move_result(
             self,
-            board: Board,
-            origin: str,
-            target: str,
-    ) -> bool:
-        origin_coord = Coordinates(origin[0], int(origin[1]))
-        target_coord = Coordinates(target[0], int(target[1]))
-        return board._validate_capture(origin_coord, target_coord)
+            moves_list: List[Tuple[Piece, List[str]]],
+    ) -> GameAIResult:
+        piece, move_opts = choice(moves_list)
+        move = choice(move_opts)
+        return GameAIResult(
+            play_type=GameAIResultType.MOVEMENT,
+            origin=piece.coordinates,
+            jumps=None,
+            destiny=Coordinates(move[0], int(move[1]))
+        )
 
     def __find_captures(
             self,
             board: Board,
-            origin: str,
             piece: Piece,
-            captures: List[Tuple[str, str]] = None,
-    ) -> List[Tuple[str, str]]:
-        if captures is None:
-            captures = []
-        piece_color = piece.color
-        lgt = piece.move_length
-        coords = f'{piece.coordinates.col}{piece.coordinates.row}'
+            origin_node: Optional[Node] = None,
+    ) -> None:
+        lgt = piece.jump_length
+        print(f'Obtaining all movementes within {lgt} squares')
+        coords = None
+        if origin_node is None:
+            coords = f'{piece.coordinates.col}{piece.coordinates.row}'
+        else:
+            coords = origin_node.destiny
         # dada uma posição inicial
+        if self.captree is None:
+            self.captree = Tree(coords)
+        if origin_node is None:
+            origin_node = self.captree.root
         # encontrar todas as peços inimigas em distânica de pulo
         left_fwd = GameAI.move_left(coords, lgt)
         right_fwd = GameAI.move_right(coords, lgt)
         left_bwd = GameAI.move_left(coords, lgt, True)
         right_bwd = GameAI.move_left(coords, lgt, True)
         # para cada peça inimiga em distância de pulo,
-        # verificar se há espaço em branco depois da peça
-
-        # repetir até que não haja peça para pular ou espaço atrás
-        # verificar se essa opção é mais longa que a atualmente mais longa
-        # alterar referência da mais longa caso necessário
-        pass
+        print('2.2 - Got the Moves')
+        print([left_fwd, right_fwd, left_bwd, right_bwd])
+        for moves in [left_fwd, right_fwd, left_bwd, right_bwd]:
+            print('2.3 - Checking Moves')
+            print(moves)
+            closest = None
+            maxidx = len(moves) - 2
+            print(maxidx)
+            i = 0
+            if len(moves) >= 2:
+                while i <= maxidx and closest is None:
+                    print('Moves I: ', i)
+                    sqr = moves[i]
+                    next_sqr = moves[i+1]
+                    i += 1
+                    tgt = Coordinates(sqr[0], int(sqr[1]))
+                    dest = Coordinates(next_sqr[0], int(next_sqr[1]))
+                    # verificar se há espaço em branco depois da peça
+                    value = board._validate_capture(tgt, dest)
+                    if value == 2:
+                        # queen
+                        closest = origin_node.append_child(sqr, next_sqr, True)
+                    elif value == 1:
+                        # pawn
+                        closest = origin_node.append_child(sqr, next_sqr)
+                # repetir até que não haja peça para pular ou espaço atrás
+            if closest is not None:
+                self.__find_captures(board, piece, closest)
 
     def __get_queen_moves(
             self,
             board: Board,
             piece: Queen,
-    ) -> Tuple[List[str], List[List[str]]]:
+    ) -> List[str]:
         coordinates = piece.coordinates
         coords = f'{coordinates.col}{coordinates.row}'
         left_fwd = GameAI.move_left(coords, 7)
@@ -195,7 +254,6 @@ class GameAI:
         left_bwd = GameAI.move_left(coords, 7, True)
         right_bwd = GameAI.move_right(coords, 7, True)
         movements = []
-        captures = []
         for move_list in [left_fwd, right_fwd, left_bwd, right_bwd]:
             maxidx = len(move_list) - 1
             i = 0
@@ -204,38 +262,23 @@ class GameAI:
                 if board.is_empty(move_list[i]):
                     movements.append(move_list[i])
                 else:
-                    # Adjust this board.is_empty() params
-                    if i < maxidx and board.is_empty(move_list[i + 1]):
-                        valid = self.__validate_capture(
-                            board,
-                            move_list[i],
-                            move_list[i + 1],
-                        )
-                        if valid:
-                            capt = self.__find_captures(
-                                board,
-                                origin=move_list[i],
-                                piece=piece,
-                            )
-                            captures.append(capt)
-                        else:
-                            _stop = True
-                    i += 1
+                    _stop = True
                 i += 1
-        return (movements, captures)
+        return movements
 
     def __get_pawn_moves(
             self,
             board: Board,
             piece: Pawn,
-            endboard: bool = False,
-    ) -> Tuple[List[str], List[str]]:
+            endboard: bool = True,
+    ) -> List[str]:
         coordinates = piece.coordinates
         coords = f'{coordinates.col}{coordinates.row}'
         left_fwd = GameAI.move_left(coords, 1, endboard)
         right_fwd = GameAI.move_right(coords, 1, endboard)
         movements = []
-        captures = []
+        print([left_fwd, right_fwd])
+        print([left_fwd, right_fwd])
         for move_list in [left_fwd, right_fwd]:
             maxidx = len(move_list) - 1
             i = 0
@@ -244,35 +287,9 @@ class GameAI:
                 if board.is_empty(move_list[i]):
                     movements.append(move_list[i])
                 else:
-                    if i < maxidx and board.is_empty(move_list[i + 1]):
-                        valid = self.__validate_capture(
-                            board,
-                            move_list[i],
-                            move_list[i + 1],
-                        )
-                        if valid:
-                            capt = self.__find_captures(
-                                board,
-                                origin=move_list[i],
-                                piece=piece,
-                            )
-                            captures.append(capt)
-                        else:
-                            _stop = True
-                        i += 1
+                    _stop = True
                 i += 1
-        return (movements, captures)
-
-    def _eval_queen_capture(self, board: Board, piece: Queen):
-        captures = self.__get_queen_moves(board, piece.coordinates)
-
-    def _eval_capture(self, piece: Piece, captures: List[str]):
-        if len(captures) == 0:
-            return 0
-        else:
-            for capture in captures:
-                # atribute a value for each capture
-                pass
+        return movements
 
     def evaluate_moves(self, game: Checkers, robot: bool = True):
         board = game._board
@@ -281,28 +298,49 @@ class GameAI:
             pieces = game._getpiece_by_color(self.__robotcolor)
         else:
             pieces = game._getpiece_by_color(self.__advcolor)
+        print('2 - Pieces Obtained')
         for piece in pieces:
-            moves = []
-            captures = []
-            if isinstance(piece, Queen):
-                moves, captures = self.__get_queen_moves(
-                    board,
-                    piece,
-                )
-            else:
-                moves, captures = self.__get_pawn_moves(
-                    board,
-                    piece,
-                )
+            coords = f'{piece.coordinates.col}{piece.coordinates.row}'
+            self.captree = Tree(coords)
+            print('2.1 - Reseting Capture Tree')
             # In Priority Order:
             # 1. Capture
             # 1.1 Capture most pieces
             # 1.2 Capture most valuable pieces
-            self._eval_capture(piece, captures)
-            print(piece)
-            print(moves)
-            print(captures)
+            self.__find_captures(
+                board,
+                piece,
+            )
+            print('2.2 - Possible Captures calculated')
+            deepest_node = self.captree.depth_search()
+            if deepest_node.depth > self.deepest_capt_value:
+                self.deepest_capt = self.captree.trace_back(deepest_node)
+        if self.deepest_capt_value > 0:
+            print('2.2.1 - Possible Capture found')
+            return self.__capture_result()
+        print('3 - No captures, calculating moves')
+        all_moves = []
+        for piece in pieces:
             # 2. Move
+            print(piece)
+            moves = []
+            if isinstance(piece, Queen):
+                print('3.1 - Calculating Queen Moves')
+                moves = self.__get_queen_moves(
+                    board,
+                    piece,
+                )
+            else:
+                print('3.2 - Calculating Pawn Moves')
+                moves = self.__get_pawn_moves(
+                    board,
+                    piece,
+                )
+            print(moves)
+            if len(moves) > 0:
+                all_moves.append((piece, moves))
+        if len(all_moves) > 0:
+            return self.__move_result(all_moves)
             # 2.1 Move to promote
             # 2.2 Move to capture
             # 2.3 Move defensively

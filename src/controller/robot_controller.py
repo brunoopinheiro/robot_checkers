@@ -196,6 +196,17 @@ class RobotController:
         self._move_z(z)
         self.drop_piece()
 
+    def capture_and_remove(self, origin, jumps):
+        size = len(jumps)
+        targets = [None] * size
+        dests = [None] * size
+        for i in range(size):
+            targets[i] = jumps[i][0]
+            dests[i] = jumps[i][1]
+        self.capture_piece(origin, dests)
+        for tgt in targets:
+            self.remove_piece_from_board(tgt)
+
     def _get_queen(self, queen: str) -> None:
         """Retrieves a queen and returns to the
         `upper_movement_height` position"""
