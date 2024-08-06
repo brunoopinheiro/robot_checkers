@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from typing import List
 from game.piece import Piece, Coordinates
+from game.queen import Queen
 from proto.messages import (
     Square as ProtoSquare,
     Row,
@@ -108,3 +110,51 @@ class Board:
         if self.__board[c][r].content is None:
             return True
         return False
+
+    def __clear_board(self) -> None:
+        for key in self.__access.keys():
+            i, j = self.get_square(key[1], int(key[0]))
+            self.__board[i][j].content = None
+
+    def overwrite_board(self, pieces_list: List[Piece]):
+        self.__clear_board()
+        for piece in pieces_list:
+            i, j = self.get_square(
+                piece.coordinates.col,
+                piece.coordinates.row,
+            )
+            self.__board[i][j].content = piece
+
+    def _validate_capture(
+            self,
+            origin_coordinates: Coordinates,
+            target_coordinates: Coordinates,
+    ) -> int:
+        """Returns the value of a possible capture.
+        0 means it is not a valid capture.
+        1 means it is a pawn capture.
+        2 means it is a queen capture.
+
+        Args:
+            origin_coordinates (Coordinates):
+                the coordinates of the jumping piece
+            target_coordinates (Coordinates):
+                the coordinates of the target piece
+
+        Returns:
+            int: The value of the capture
+        """
+        o_col, o_row = origin_coordinates
+        t_col, t_row = target_coordinates
+        o_c, o_r = self.get_square(o_col, o_row)
+        t_c, t_r = self.get_square(t_col, t_row)
+        origin = self.__board[o_c][o_r]
+        target = self.__board[t_c][t_r]
+        v_sum = 0
+        if (origin.content is not None
+                and target.content is not None
+                and origin.content.color != target.content.color):
+            v_sum += 1
+            if isinstance(target.content, Queen):
+                v_sum += 1
+        return v_sum

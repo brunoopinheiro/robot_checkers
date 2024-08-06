@@ -2,7 +2,13 @@ from flask import Blueprint, jsonify, Response
 from game.checkers import Checkers
 from game.coordinates import Coordinates
 from controller.robot_controller import RobotController
-
+from capture.capture_module import CaptureModule
+from neural_network.model import Model
+from neural_network.game_ai import (
+    GameAI,
+    GameAIResult,
+    GameAIResultType,
+)
 
 GAME_NOT_STARTED = {'404': 'Game not started.'}
 
@@ -12,6 +18,7 @@ def construct_game_blueprint(
         get_game_instance,
         eng_game_function,
         robotcontroller: RobotController,
+        model: Model,
 ) -> Blueprint:
 
     game_controller = Blueprint('game_controller', __name__)
@@ -39,20 +46,20 @@ def construct_game_blueprint(
         return jsonify({
             0: {
                 'title': 'Start Game',
-                'route': '../start/<int:first_player>/<p1_color>/<p2_color>',
+                'route': '../start/<int:robot>/<p1_color>/<p2_color>',
                 'http_method': 'GET',
                 'desc': 'Starts a checkers game.',
             }
         })
 
     @game_controller.route(
-            '/start/<int:first_player>/<p1_color>/<p2_color>',
+            '/start/<int:first_player>/<human_color>/<robot_color>',
             methods=['GET'],
         )
     def start_game(
         first_player: int,
-        p1_color: str,
-        p2_color: str,
+        human_color: str,
+        robot_color: str,
     ):
         # convert to proto
         game_instance = get_game_instance()
@@ -60,8 +67,8 @@ def construct_game_blueprint(
             return jsonify({'Error': 'Game already in progress'}), 400
         game = Checkers(
             first_player=first_player,
-            player1_color=p1_color.lower(),
-            player2_color=p2_color.lower(),
+            human_color=human_color.lower(),
+            robot_color=robot_color.lower(),
         )
         init_game_function(game)
         return jsonify({'ok': 'game started'}), 200
@@ -72,11 +79,82 @@ def construct_game_blueprint(
         res = Response(bytes(protogame), status=200)
         return res
 
+    def __make_move(next_play: GameAIResult) -> bool:
+        game: Checkers = get_game_instance()
+        print(next_play)
+        if next_play.play_type == GameAIResultType.CAPTURE:
+            res = game.jump_multiple(
+                next_play.origin,
+                [(j.target, j.destiny) for j in next_play.jumps],
+            )
+            if res is True:
+                origin = f'{next_play.origin.col}{next_play.origin.row}'
+                jumps = []
+                for j in next_play.jumps:
+                    tgt = f'{j.target.col}{j.target.row}'
+                    dt = f'{j.destiny.col}{j.destiny.row}'
+                    jumps.append((tgt, dt))
+                robotcontroller.capture_and_remove(origin, jumps=jumps)
+                # this is not automatically placing a queen
+                return True
+        if next_play.play_type == GameAIResultType.MOVEMENT:
+            res = game.move_piece(next_play.origin, next_play.destiny)
+            if res is True:
+                origin = f'{next_play.origin.col}{next_play.origin.row}'
+                destiny = f'{next_play.destiny.col}{next_play.destiny.row}'
+                robotcontroller.capture_piece(origin, [destiny])
+                return True
+        return False
+
     @game_controller.route('/robot_play', methods=['GET'])
     def robot_play():
-        print('This robot doesnt know how to decide its play yet.')
+        # go to upperview
+        game_instance: Checkers = get_game_instance()
+        if game_instance is None:
+            return jsonify(GAME_NOT_STARTED), 404
+        robotcontroller.to_upperboard()
+        img = None
+        count = 0
+        cam_idx = 0
+        table = robotcontroller.move_map.table
+        if table == 2:
+            cam_idx = 1
+        capture_module = CaptureModule(cam_idx)
+        camera_capt = True
+        while img is None and count < 3:
+            img = capture_module.capture_opencv()
+            count += 1
+            print('Retrying...')
+            if count >= 2:
+                camera_capt = False
+                # return jsonify({'Error', 'Could not capture a picture'}), 500
+        capture_module.video_capture.release()
+        print('This may take a while, please wait...')
+        # detect board, update board
+        if camera_capt is True:
+            predict_list = model.predict_from_opencv(img, table)
+            # decide play
+            pieces_list = GameAI.detection_to_gamepieces(
+                predict_list,
+                game_instance,
+            )
+            game_instance.overwrite_board(pieces_list)
+        # play
+        gameai = GameAI(
+            robot=game_instance.robot_color,
+            adv=game_instance.human_color,
+        )
+        print('1 - AI Initiated')
+        next_play = gameai.evaluate_moves(game_instance)
+        playres = __make_move(next_play)
         protogame = __getprotoboard()
-        res = Response(bytes(protogame), status=200)
+        status = 0
+        if playres is True:
+            status = 200
+        else:
+            status = 500
+        # return board as proto
+        res = Response(bytes(protogame), status=status)
         return res
 
     @game_controller.route('/move_piece/<origin>/<destiny>', methods=['GET'])

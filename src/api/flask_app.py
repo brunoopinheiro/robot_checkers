@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 from flask import Flask
 from waitress import serve
@@ -18,6 +19,13 @@ from game.checkers import Checkers
 
 
 class FlaskApp:
+
+    __instance = None
+
+    def __new__(cls, *args, **kwargs) -> FlaskApp:
+        if FlaskApp.__instance is None:
+            FlaskApp.__instance = super(FlaskApp, cls).__new__(cls)
+        return FlaskApp.__instance
 
     def __init__(
         self,
@@ -55,6 +63,7 @@ class FlaskApp:
             self._get_game_instance,
             self._end_game,
             self._robot_controller,
+            self._model,
         )
         self.__app.register_blueprint(
             robot_controller,
