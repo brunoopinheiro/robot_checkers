@@ -69,7 +69,6 @@ class RobotController:
         upperboardjoints = self.move_map.get_joints(
             key=_RoboStates.UPPER_BOARD.value,
         )
-        print('Voltando à visão do tabuleiro.')
         self.robot.joint_move(upperboardjoints)
 
     def to_disconnect(self) -> None:
@@ -154,7 +153,6 @@ class RobotController:
     def drop_piece(self) -> None:
         """Drops a piece in the drop box assuming the robot
         already has the piece grasped."""
-        print('Movendo peça para a caixa.')
         self._to_custom_pose(UPPER_MOVE_HEIGHT)
         self._to_custom_pose(UPPER_DROP)
         self.robot.open_tool(2)
@@ -165,8 +163,6 @@ class RobotController:
         This function does not remove pieces from the game board."""
         for tgt in targets:
             self.move_map.get_cartesian(tgt)
-        print('Iniciando Captura de Peças')
-        print(f'Origem: {origin}')
         # self.robot.close_tool()
         self.to_upperboard()
         z = self._to_upper_move(origin)
@@ -175,7 +171,6 @@ class RobotController:
         self.robot.close_tool()
         for tgt in targets:
             self._move_z(z)
-            print(f'Alvo: {tgt}')
             self._to_upper_move(tgt)
             tgt_coord = self.move_map.get_cartesian(tgt)
             self.robot.cartesian_move(tgt_coord)
@@ -186,7 +181,6 @@ class RobotController:
 
     def remove_piece_from_board(self, piece_location: str) -> None:
         """Removes a piece from the board, based on its key location."""
-        print(f'Removendo Peça {piece_location} do tabuleiro.')
         # self.robot.close_tool()
         self.to_upperboard()
         z = self._to_upper_move(piece_location)
@@ -210,13 +204,11 @@ class RobotController:
     def _get_queen(self, queen: str) -> None:
         """Retrieves a queen and returns to the
         `upper_movement_height` position"""
-        print(f'Buscando {queen}')
         # self.robot.close_tool()
         self.to_upperboard()
         self._to_custom_pose(f'{queen}_pregrip')
         self._to_custom_coords(queen)
         self.robot.close_tool()
-        print('Peça capturada')
         self._move_z(0.05)
         self._to_custom_pose(QUEEN_STEP1)
         self._to_custom_coords(QUEEN_STEP1)
@@ -237,7 +229,6 @@ class RobotController:
         )
         self.robot.cartesian_move(target)
         self.robot.open_tool()
-        print('Dama colocada')
         self._move_z(0.1)
         self._to_custom_pose(QUEEN_STEP2)
         self.to_upperboard()

@@ -34,6 +34,7 @@ def construct_game_blueprint(
     @game_controller.before_request
     def connect_robot():
         robotcontroller.connect()
+        robotcontroller.robot.open_tool()
 
     @game_controller.after_request
     def disconnect_robot(response):
@@ -81,7 +82,6 @@ def construct_game_blueprint(
 
     def __make_move(next_play: GameAIResult) -> bool:
         game: Checkers = get_game_instance()
-        print(next_play)
         if next_play.play_type == GameAIResultType.CAPTURE:
             res = game.jump_multiple(
                 next_play.origin,
@@ -124,12 +124,10 @@ def construct_game_blueprint(
         while img is None and count < 3:
             img = capture_module.capture_opencv()
             count += 1
-            print('Retrying...')
             if count >= 2:
                 camera_capt = False
-                # return jsonify({'Error', 'Could not capture a picture'}), 500
+                return jsonify({'Error', 'Could not capture a picture'}), 500
         capture_module.video_capture.release()
-        print('This may take a while, please wait...')
         # detect board, update board
         if camera_capt is True:
             predict_list = model.predict_from_opencv(img, table)
@@ -144,7 +142,6 @@ def construct_game_blueprint(
             robot=game_instance.robot_color,
             adv=game_instance.human_color,
         )
-        print('1 - AI Initiated')
         next_play = gameai.evaluate_moves(game_instance)
         playres = __make_move(next_play)
         protogame = __getprotoboard()
@@ -178,7 +175,6 @@ def construct_game_blueprint(
             )
             return jsonify({'ok': 'Piece moved.'}), 200
         except Exception as err:
-            print('Error:', err)
             return jsonify({'Error': f'{err}'}), 500
 
     @game_controller.route('/single_jump/<origin>/<target>/<destiny>')
@@ -212,7 +208,6 @@ def construct_game_blueprint(
             )
             return jsonify({'ok': 'Jump executed successfully.'}), 200
         except Exception as err:
-            print('Error: ', err)
             return jsonify({'Error': f'{err}'}), 500
 
     @game_controller.route('/end', methods=['GET'])
@@ -221,7 +216,6 @@ def construct_game_blueprint(
             results = eng_game_function()
             return jsonify(results), 200
         except Exception as err:
-            print('Error: ', err)
             return jsonify({'Error': f'{err}'}), 500
 
     return game_controller
