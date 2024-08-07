@@ -49,11 +49,11 @@ class Checkers:
 
     @property
     def human_color(self) -> str:
-        return self._p1c
+        return self._p2c
 
     @property
     def robot_color(self) -> str:
-        return self._p2c
+        return self._p1c
 
     def __new__(cls, *args, **kwargs) -> Checkers:
         if Checkers.__instance is None:
@@ -106,49 +106,49 @@ class Checkers:
         p2icon = self._geticon(self._p2c)
         for i, c in enumerate(cols):
             if i % 2 == 0:
-                pg1 = Pawn(
+                row1piece = Pawn(
                     coordinates=Coordinates(c, 1),
                     color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
-                pg2 = Pawn(
+                row3piece = Pawn(
                     coordinates=Coordinates(c, 3),
                     color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
-                self.p1_pieces.append(pg1)
-                self.p1_pieces.append(pg2)
-                pp1 = Pawn(
+                self.p1_pieces.append(row1piece)
+                self.p1_pieces.append(row3piece)
+                row7piece = Pawn(
                     coordinates=Coordinates(c, 7),
                     color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
-                self.p2_pieces.append(pp1)
+                self.p2_pieces.append(row7piece)
             else:
-                pg1 = Pawn(
+                row2piece = Pawn(
                     coordinates=Coordinates(c, 2),
                     color=self._p1c,
                     icon=p1icon,
                     promote_row=8,
                 )
-                self.p1_pieces.append(pg1)
-                pp1 = Pawn(
+                self.p1_pieces.append(row2piece)
+                row6piece = Pawn(
                     coordinates=Coordinates(c, 6),
                     color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
-                pp2 = Pawn(
+                row8piece = Pawn(
                     coordinates=Coordinates(c, 8),
                     color=self._p2c,
                     icon=p2icon,
                     promote_row=1,
                 )
-                self.p2_pieces.append(pp1)
-                self.p2_pieces.append(pp2)
+                self.p2_pieces.append(row6piece)
+                self.p2_pieces.append(row8piece)
 
     def __distance(self, origin: Coordinates, destiny: Coordinates) -> int:
         o_col, o_row = origin
