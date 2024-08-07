@@ -167,11 +167,11 @@ class CoordsParser:
             )
             for square, coords in map_dict.items():
                 x1, y1, x2, y2 = coords
-                x = (x1 + x2) / 2
-                y = (y1 + y2) / 2
                 conditions = (
-                    (box_x - tolerance) <= x <= (box_x + tolerance)
-                    and (box_y - tolerance) <= y <= (box_y + tolerance)
+                    ((x1 < (box_x-tolerance) < x2)
+                        or (x1 < (box_x+tolerance) < x2))
+                    and ((y1 < (box_y-tolerance) < y2)
+                         or (y1 < (box_y+tolerance) < y2))
                 )
                 if not found and conditions is True:
                     d_piece = DetectionPiece(
