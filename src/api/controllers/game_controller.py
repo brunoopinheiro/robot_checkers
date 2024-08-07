@@ -72,7 +72,9 @@ def construct_game_blueprint(
             robot_color=robot_color.lower(),
         )
         init_game_function(game)
-        return jsonify({'ok': 'game started'}), 200
+        protogame = __getprotoboard()
+        res = Response(bytes(protogame), status=200)
+        return res
 
     @game_controller.route('/state')
     def game_state():
@@ -154,6 +156,16 @@ def construct_game_blueprint(
             status = 500
         res = Response(bytes(protogame), status=status)
         return res
+
+    @game_controller.route('/check_winner', methods=['GET'])
+    def check_winner():
+        game_instance: Checkers = get_game_instance()
+        if game_instance is None:
+            return jsonify(GAME_NOT_STARTED), 404
+        if game_instance.is_finished:
+            return jsonify({'winner': f'{game_instance.winner}'}), 200
+        else:
+            return jsonify({'winner': 'None'}), 204
 
     @game_controller.route('/move_piece/<origin>/<destiny>', methods=['GET'])
     def move_piece(origin, destiny):
