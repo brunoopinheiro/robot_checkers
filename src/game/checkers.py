@@ -364,6 +364,7 @@ class Checkers:
         self.p1_queens = 0
         self.p2_queens = 0
         for piece in pieces_list:
+            print(piece)
             if piece.color == self._p1c:
                 p1_pieces.append(piece)
                 if isinstance(piece, Queen):

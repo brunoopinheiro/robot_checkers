@@ -126,7 +126,7 @@ def construct_game_blueprint(
             count += 1
             if count >= 2:
                 camera_capt = False
-                # return jsonify({'Error', 'Could not capture a picture'}), 500
+                return jsonify({'Error', 'Could not capture a picture'}), 500
         capture_module.video_capture.release()
         # detect board, update board
         if camera_capt is True:
@@ -136,6 +136,7 @@ def construct_game_blueprint(
                 predict_list,
                 game_instance,
             )
+            print(pieces_list)
             game_instance.overwrite_board(pieces_list)
         # play
         gameai = GameAI(
@@ -143,6 +144,7 @@ def construct_game_blueprint(
             adv=game_instance.human_color,
         )
         next_play = gameai.evaluate_moves(game_instance)
+        print(next_play)
         playres = __make_move(next_play)
         protogame = __getprotoboard()
         status = 0
@@ -150,7 +152,6 @@ def construct_game_blueprint(
             status = 200
         else:
             status = 500
-        # return board as proto
         res = Response(bytes(protogame), status=status)
         return res
 
