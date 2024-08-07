@@ -217,7 +217,6 @@ class GameAI:
         left_bwd = GameAI.move_left(coords, lgt, True)
         right_bwd = GameAI.move_left(coords, lgt, True)
         # para cada peça inimiga em distância de pulo,
-        print('2.2 - Got the Moves')
         print([left_fwd, right_fwd, left_bwd, right_bwd])
         for moves in [left_fwd, right_fwd, left_bwd, right_bwd]:
             print('2.3 - Checking Moves')
@@ -281,8 +280,6 @@ class GameAI:
         left_fwd = GameAI.move_left(coords, 1, endboard)
         right_fwd = GameAI.move_right(coords, 1, endboard)
         movements = []
-        print([left_fwd, right_fwd])
-        print([left_fwd, right_fwd])
         for move_list in [left_fwd, right_fwd]:
             maxidx = len(move_list) - 1
             i = 0
@@ -302,11 +299,9 @@ class GameAI:
             pieces = game._getpiece_by_color(self.__robotcolor)
         else:
             pieces = game._getpiece_by_color(self.__advcolor)
-        print('2 - Pieces Obtained')
         for piece in pieces:
             coords = f'{piece.coordinates.col}{piece.coordinates.row}'
             self.captree = Tree(coords)
-            print('2.1 - Reseting Capture Tree')
             # In Priority Order:
             # 1. Capture
             # 1.1 Capture most pieces
@@ -315,27 +310,21 @@ class GameAI:
                 board,
                 piece,
             )
-            print('2.2 - Possible Captures calculated')
             deepest_node = self.captree.depth_search()
             if deepest_node.depth > self.deepest_capt_value:
                 self.deepest_capt = self.captree.trace_back(deepest_node)
         if self.deepest_capt_value > 0:
-            print('2.2.1 - Possible Capture found')
             return self.__capture_result()
-        print('3 - No captures, calculating moves')
         all_moves = []
         for piece in pieces:
             # 2. Move
-            print(piece)
             moves = []
             if isinstance(piece, Queen):
-                print('3.1 - Calculating Queen Moves')
                 moves = self.__get_queen_moves(
                     board,
                     piece,
                 )
             else:
-                print('3.2 - Calculating Pawn Moves')
                 moves = self.__get_pawn_moves(
                     board,
                     piece,
