@@ -297,12 +297,11 @@ class GameAI:
 
     def evaluate_moves(self, game: Checkers, robot: bool = True):
         board = game._board
-        # pieces = []
-        # if robot:
-        #     pieces = game._getpiece_by_color(self.__robotcolor)
-        # else:
-        #     pieces = game._getpiece_by_color(self.__advcolor)
-        pieces = game._getpiece_by_color(self.__advcolor)
+        pieces = []
+        if robot:
+            pieces = game._getpiece_by_color(self.__robotcolor)
+        else:
+            pieces = game._getpiece_by_color(self.__advcolor)
         print('2 - Pieces Obtained')
         for piece in pieces:
             coords = f'{piece.coordinates.col}{piece.coordinates.row}'

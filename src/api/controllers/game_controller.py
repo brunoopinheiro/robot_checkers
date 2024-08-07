@@ -126,7 +126,7 @@ def construct_game_blueprint(
             count += 1
             if count >= 2:
                 camera_capt = False
-                return jsonify({'Error', 'Could not capture a picture'}), 500
+                # return jsonify({'Error', 'Could not capture a picture'}), 500
         capture_module.video_capture.release()
         # detect board, update board
         if camera_capt is True:
