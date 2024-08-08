@@ -146,9 +146,9 @@ class CoordsParser:
         return list(filter(lambda x: x['confidence'], input_list))
 
     @staticmethod
-    def detect_checkboard(image_source):
+    def detect_checkboard(image_source, show=False):
         # Rectify image
-        Rectifier.rectify(image_source)
+        return Rectifier.rectify(image_source, show)
         # find the biggest contour
         # biggest = None
         # for contour in contours:
@@ -166,6 +166,7 @@ class CoordsParser:
         refference_dict: RefferenceDict,
         tolerance: int = 15,
     ) -> List[DetectionPiece]:
+        # change this function
         map_dict = CoordsParser.__get_dict(refference_dict)
         locations = []
         confiable_detections = CoordsParser.__filter_conf(input_list)

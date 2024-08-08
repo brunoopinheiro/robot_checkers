@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Optional
 from json import loads
 from neural_network.coords_parser import CoordsParser
+from neural_network.rectfier.rectifier import Rectifier
 
 
 class YOLOModels(Enum):
@@ -54,10 +55,11 @@ class Model:
             jsonr = r.tojson()
             print(jsonr)
 
-    def predict_from_opencv(self, cv_image, robot_ref: int):
+    def predict_from_opencv(self, cv_image):
         # res will always be a list with one element
+        rectified_img, board_ref = Rectifier.rectify(cv_image)
         res = self.__model.predict(
-            source=cv_image,
+            source=rectified_img,
             show=True,
             save=True,
             save_txt=True,
@@ -65,5 +67,5 @@ class Model:
         r = res[0]
         jsonr = r.tojson()
         reslist = loads(jsonr)
-        mapped_pieces = CoordsParser.map_pieces(reslist, robot_ref)
+        mapped_pieces = CoordsParser.map_pieces(reslist, board_ref)
         return mapped_pieces

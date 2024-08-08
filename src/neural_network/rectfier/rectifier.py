@@ -8,7 +8,14 @@ import numpy as np
 class Rectifier:
 
     @staticmethod
-    def rectify(image_source):
+    def map_board(rectified_image):
+        # given the rectified image dimensions,
+        pass
+        # divide it in a 8x8 grid
+        # map each square box to a coordinate
+
+    @staticmethod
+    def rectify(image_source, show=False):
         try:
             areas = []
             list_points = []
@@ -21,23 +28,26 @@ class Rectifier:
 
             grayimg = cv2.cvtColor(image_source, cv2.COLOR_BGR2GRAY)
             binimg = cv2.Canny(grayimg, 110, 200, 3)
-            cv2.imshow('Canny', binimg)
-            cv2.waitKey(0)
+            if show is True:
+                cv2.imshow('Canny', binimg)
+                cv2.waitKey(0)
             dkernel = np.ones((5, 5))
             ekernel = np.ones((3, 3))
             img_dilate = cv2.dilate(binimg, dkernel, iterations=1)
             img_erode = cv2.erode(img_dilate, ekernel, iterations=1)
-            cv2.imshow('dilate/erode', img_erode)
-            cv2.waitKey(0)
+            if show is True:
+                cv2.imshow('dilate/erode', img_erode)
+                cv2.waitKey(0)
             contours, _ = cv2.findContours(
                 img_dilate,
                 cv2.RETR_EXTERNAL,
                 cv2.CHAIN_APPROX_SIMPLE,
             )
-            copyimg = image_source.copy()
-            cv2.drawContours(copyimg, contours, -1, (0, 255, 0), 3)
-            cv2.imshow('Countours', copyimg)
-            cv2.waitKey(0)
+            if show is True:
+                copyimg = image_source.copy()
+                cv2.drawContours(copyimg, contours, -1, (0, 255, 0), 3)
+                cv2.imshow('Countours', copyimg)
+                cv2.waitKey(0)
             for c in contours:
                 area = cv2.contourArea(c)
                 areas.append(area)
@@ -122,7 +132,8 @@ class Rectifier:
 
             list_out = [point1[0], point1[1], point2[0], point2[1],
                         point3[0], point3[1], point4[0], point4[1]]
-            print(list_out)
+            if show is True:
+                print(list_out)
             points_in = np.float32([[list_out[0], list_out[1]],
                                     [list_out[2], list_out[3]],
                                     [list_out[4], list_out[5]],
@@ -131,8 +142,9 @@ class Rectifier:
                                     [0, 480], [640, 480]])
             matrix = cv2.getPerspectiveTransform(points_in, points_out)
             rectified = cv2.warpPerspective(image_source, matrix, (640, 480))
-            cv2.imshow('Rectified Img', rectified)
-            cv2.waitKey(0)
+            if show is True:
+                cv2.imshow('Rectified Img', rectified)
+                cv2.waitKey(0)
             return rectified
         except Exception as e:
             print(e)
