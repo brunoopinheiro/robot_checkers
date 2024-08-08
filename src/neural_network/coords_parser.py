@@ -1,7 +1,9 @@
+import cv2
 from enum import Enum
 from neural_network.detection_classes import DetectionClasses
 from game.coordinates import Coordinates
 from proto.messages import PieceType
+from neural_network.rectfier.rectifier import Rectifier
 from dataclasses import dataclass
 from typing import List, Tuple
 
@@ -142,6 +144,21 @@ class CoordsParser:
     @staticmethod
     def __filter_conf(input_list):
         return list(filter(lambda x: x['confidence'], input_list))
+
+    @staticmethod
+    def detect_checkboard(image_source):
+        # Rectify image
+        Rectifier.rectify(image_source)
+        # find the biggest contour
+        # biggest = None
+        # for contour in contours:
+        #     if biggest is None or cv2.contourArea(contour) > cv2.contourArea(biggest):
+        #         print(biggest)
+        #         biggest = contour
+        # divide the contour into a 8x8 grid
+
+        # create a dictionary with the coordinates of each square
+        # return the dictionary
 
     @staticmethod
     def map_pieces(
