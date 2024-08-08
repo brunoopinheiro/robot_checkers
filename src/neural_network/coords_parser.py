@@ -154,8 +154,8 @@ class CoordsParser:
             box_y1 = box_piece['y1']
             box_x2 = box_piece['x2']
             box_y2 = box_piece['y2']
-            center_x = (box_x1+box_x2)/2
-            center_y = (box_y1+box_y2)/2 
+            center_x = (box_x1+box_x2)/2 # get the x coordinate of the box_piece center
+            center_y = (box_y1+box_y2)/2  # get the y coordinates of the box_piece center
             found = False
             piece_class, piece_type, color = CoordsParser.__get_class(
                 int(piece['class'])
@@ -171,7 +171,7 @@ class CoordsParser:
                 if not found and conditions is True:
                     d_piece = DetectionPiece(
                         piece_class,
-                        Coordinates(square[0], int(square[1])),
+                        Coordinates(square[0], int(square[1])), # the square[0] is without casting
                         color,
                         piece_type,
                     )
