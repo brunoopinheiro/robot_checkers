@@ -23,6 +23,7 @@ class FlaskApp:
     __instance = None
 
     def __new__(cls, *args, **kwargs) -> FlaskApp:
+        # singleton
         if FlaskApp.__instance is None:
             FlaskApp.__instance = super(FlaskApp, cls).__new__(cls)
         return FlaskApp.__instance
@@ -33,6 +34,17 @@ class FlaskApp:
         robot_type: RobotEnum = RobotEnum.KINOVA,
         table: RobotTableEnum = RobotTableEnum.KINOVA,
     ) -> None:
+        """Entrypoint for the Flask Application.
+
+        Args:
+            debug (bool, optional): Indicates the serving mode for the API.
+            Defaults to False.
+            robot_type (RobotEnum, optional): Indicates which robot is used.
+            Defaults to RobotEnum.KINOVA.
+            table (RobotTableEnum, optional): Indicates the joints and pose
+            dictionary used to indicate the robot positions.
+            Defaults to RobotTableEnum.KINOVA.
+        """
         self.__app = Flask(__name__)
         self._robot_controller = self.__initiate_robot_controller(
             robot_type=robot_type,
@@ -48,10 +60,21 @@ class FlaskApp:
             self.start_server()
 
     def __register_template(self) -> None:
+        """Indicates to Flask where the static
+        and template files are located.
+        """
         self.__app.static_folder = 'views/static'
         self.__app.template_folder = 'views/template'
 
     def __register_blueprints(self, table) -> None:
+        """Registers in the Flask Application the
+        `Blueprint`s (see Flask documentation) that
+        controls the requests received by the application.
+
+        Args:
+            table (RobotTableEnum): The reference used
+            for the game table.
+        """
         robot_controller = construct_robot_blueprint(
             self._robot_controller,
             self._model,
