@@ -4,7 +4,8 @@ from game.board import Board, Coordinates
 from game.piece import Piece
 from game.pawn import Pawn
 from game.queen import Queen
-from neural_network.coords_parser import DetectionPiece, PieceType
+from neural_network.detection_piece import DetectionPiece
+from proto.messages import PieceType
 from neural_network.results.game_ai_result import (
     GameAIResult,
     GameAIResultType,
@@ -299,6 +300,7 @@ class GameAI:
             pieces = game._getpiece_by_color(self.__robotcolor)
         else:
             pieces = game._getpiece_by_color(self.__advcolor)
+        print(pieces)
         for piece in pieces:
             coords = f'{piece.coordinates.col}{piece.coordinates.row}'
             self.captree = Tree(coords)
@@ -354,6 +356,8 @@ class GameAI:
             pieces_list: List[DetectionPiece],
             game: Checkers,
     ) -> List[Piece]:
+        print("Pieces List")
+        print(pieces_list)
         filtered_list = GameAI.filter_outerboard(pieces_list)
         pieces = [None] * len(filtered_list)
         i = 0

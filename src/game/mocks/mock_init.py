@@ -1,5 +1,5 @@
+from neural_network.detection_piece import DetectionPiece
 from neural_network.coords_parser import (
-    DetectionPiece,
     DetectionClasses,
     Coordinates,
     PieceType,
