@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pprint import pprint
 
 # Code adapted from
 # https://github.com/felipeadsm/rectification-and-extraction-of-chars-from-images/blob/main/Rectify.py#L5
@@ -10,9 +11,32 @@ class Rectifier:
     @staticmethod
     def map_board(rectified_image):
         # given the rectified image dimensions,
-        pass
+        height, width, _ = rectified_image.shape
+        sqr_h = height // 8
+        sqr_w = width // 8
+        print(f'Board: {height}x{width} || Sqr: {sqr_h}x{sqr_w}')
+        i = 0
+        map_dict = {}
+        # do início da `width` até o fim, step de sqr_h
+        for h in range(height, 0, -sqr_h):
+            # do fim da `height` até o início, step de -sqr_w
+            for w in range(0, width, sqr_w):
+                x1 = w
+                y1 = h-sqr_h
+                x2 = w+sqr_w
+                y2 = h-sqr_h
+                x3 = w
+                y3 = h
+                x4 = w+sqr_w
+                y4 = h
+                sqr_box = [x1, y1, x2, y2,
+                           x3, y3, x4, y4]
+                map_dict.setdefault(i, sqr_box)
+                i += 1
         # divide it in a 8x8 grid
+        pprint(map_dict)
         # map each square box to a coordinate
+        return map_dict
 
     @staticmethod
     def rectify(image_source, show=False):
@@ -139,9 +163,9 @@ class Rectifier:
                                     [list_out[4], list_out[5]],
                                     [list_out[6], list_out[7]]])
             points_out = np.float32([[0, 0], [640, 0],
-                                    [0, 480], [640, 480]])
+                                    [0, 640], [640, 640]])
             matrix = cv2.getPerspectiveTransform(points_in, points_out)
-            rectified = cv2.warpPerspective(image_source, matrix, (640, 480))
+            rectified = cv2.warpPerspective(image_source, matrix, (640, 640))
             if show is True:
                 cv2.imshow('Rectified Img', rectified)
                 cv2.waitKey(0)

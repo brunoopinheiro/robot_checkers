@@ -4,7 +4,8 @@ from game.board import Board, Coordinates
 from game.piece import Piece
 from game.pawn import Pawn
 from game.queen import Queen
-from neural_network.coords_parser import DetectionPiece, PieceType
+from neural_network.detection_piece import DetectionPiece
+from proto.messages import PieceType
 from neural_network.results.game_ai_result import (
     GameAIResult,
     GameAIResultType,

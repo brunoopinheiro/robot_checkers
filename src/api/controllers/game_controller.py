@@ -132,6 +132,9 @@ def construct_game_blueprint(
         capture_module.video_capture.release()
         # detect board, update board
         if camera_capt is True:
+            # rectify camera_capt
+            # rectified -> mapper
+            # rectified -> model
             predict_list = model.predict_from_opencv(img, table)
             # decide play
             pieces_list = GameAI.detection_to_gamepieces(
