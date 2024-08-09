@@ -57,7 +57,8 @@ class Model:
 
     def predict_from_opencv(self, cv_image):
         # res will always be a list with one element
-        rectified_img, board_ref = Rectifier.rectify(cv_image)
+        rectified_img = Rectifier.rectify(cv_image)
+        board_ref = Rectifier.map_board(rectified_img)
         res = self.__model.predict(
             source=rectified_img,
             show=True,

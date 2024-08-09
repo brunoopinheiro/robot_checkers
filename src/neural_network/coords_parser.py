@@ -41,10 +41,6 @@ class CoordsParser:
             raise SystemError('Detection Class Not Found')
 
     @staticmethod
-    def __filter_conf(input_list):
-        return list(filter(lambda x: x['confidence'], input_list))
-
-    @staticmethod
     def detect_checkboard(image_source, show=False):
         # Rectify image
         rectified_img = Rectifier.rectify(image_source, show)
@@ -57,10 +53,8 @@ class CoordsParser:
         input_list,
         refference_dict,
     ) -> List[DetectionPiece]:
-        # change this function
         locations = []
-        confiable_detections = CoordsParser.__filter_conf(input_list)
-        for piece in confiable_detections:
+        for piece in input_list:
             box_piece = piece['box']
             box_x1 = box_piece['x1']
             box_y1 = box_piece['y1']
@@ -78,7 +72,7 @@ class CoordsParser:
                 _, _, x2, y2, x3, y3, _, _ = coords
                 condition = (
                     (center_x > x3 and center_x < x2)
-                    and (center_y > y3 and center_y < y2)
+                    and (center_y > y2 and center_y < y3)
                 )
                 if found is False and condition is True:
                     found = True

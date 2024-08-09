@@ -118,9 +118,6 @@ def construct_game_blueprint(
         img = None
         count = 0
         cam_idx = 0
-        table = robotcontroller.move_map.table
-        if table == 2:
-            cam_idx = 1
         capture_module = CaptureModule(cam_idx)
         camera_capt = True
         while img is None and count < 3:
@@ -135,13 +132,12 @@ def construct_game_blueprint(
             # rectify camera_capt
             # rectified -> mapper
             # rectified -> model
-            predict_list = model.predict_from_opencv(img, table)
+            predict_list = model.predict_from_opencv(img)
             # decide play
             pieces_list = GameAI.detection_to_gamepieces(
                 predict_list,
                 game_instance,
             )
-            print(pieces_list)
             game_instance.overwrite_board(pieces_list)
         # play
         gameai = GameAI(

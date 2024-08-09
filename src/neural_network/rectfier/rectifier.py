@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from pprint import pprint
 
 # Code adapted from
 # https://github.com/felipeadsm/rectification-and-extraction-of-chars-from-images/blob/main/Rectify.py#L5
@@ -14,7 +13,6 @@ class Rectifier:
         height, width, _ = rectified_image.shape
         sqr_h = height // 8
         sqr_w = width // 8
-        print(f'Board: {height}x{width} || Sqr: {sqr_h}x{sqr_w}')
         i = 0
         map_dict = {}
         # do início da `width` até o fim, step de sqr_h
@@ -34,7 +32,6 @@ class Rectifier:
                 map_dict.setdefault(i, sqr_box)
                 i += 1
         # divide it in a 8x8 grid
-        pprint(map_dict)
         # map each square box to a coordinate
         return map_dict
 
@@ -75,7 +72,7 @@ class Rectifier:
             for c in contours:
                 area = cv2.contourArea(c)
                 areas.append(area)
-                perimeter = cv2.arcLength(c, True)
+                perimeter = cv2.arcLength(c, False)
                 approx = cv2.approxPolyDP(c, 0.02 * perimeter, True)
                 list_points.append(approx)
 
@@ -86,7 +83,6 @@ class Rectifier:
 
                     if len(list_points[i]) == 4:
                         points_aux = list_points[i]
-
                 i = i + 1
 
             sum0 = points_aux[0, 0, 0] + points_aux[0, 0, 1]
@@ -157,6 +153,7 @@ class Rectifier:
             list_out = [point1[0], point1[1], point2[0], point2[1],
                         point3[0], point3[1], point4[0], point4[1]]
             if show is True:
+                print('List Out')
                 print(list_out)
             points_in = np.float32([[list_out[0], list_out[1]],
                                     [list_out[2], list_out[3]],
