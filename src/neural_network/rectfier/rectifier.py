@@ -169,4 +169,4 @@ class Rectifier:
             return rectified
         except Exception as e:
             print(e)
-            return image_source
+            # return image_source

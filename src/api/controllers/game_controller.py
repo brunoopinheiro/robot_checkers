@@ -3,6 +3,7 @@ from game.checkers import Checkers
 from game.coordinates import Coordinates
 from controller.robot_controller import RobotController
 from capture.capture_module import CaptureModule
+import cv2
 from neural_network.model import Model
 from neural_network.game_ai import (
     GameAI,
@@ -38,8 +39,9 @@ def construct_game_blueprint(
 
     @game_controller.after_request
     def disconnect_robot(response):
-        robotcontroller.to_disconnect()
+        # robotcontroller.to_disconnect()
         robotcontroller.disconnect()
+        cv2.destroyAllWindows()
         return response
 
     @game_controller.route('/help', methods=['GET'])
@@ -110,51 +112,55 @@ def construct_game_blueprint(
 
     @game_controller.route('/robot_play', methods=['GET'])
     def robot_play():
-        # go to upperview
-        game_instance: Checkers = get_game_instance()
-        if game_instance is None:
-            return jsonify(GAME_NOT_STARTED), 404
-        robotcontroller.to_upperboard()
-        img = None
-        count = 0
-        cam_idx = 0
-        capture_module = CaptureModule(cam_idx)
-        camera_capt = True
-        while img is None and count < 3:
-            img = capture_module.capture_opencv()
-            count += 1
-            if count >= 2:
-                camera_capt = False
-                return jsonify({'Error', 'Could not capture a picture'}), 500
-        capture_module.video_capture.release()
-        # detect board, update board
-        if camera_capt is True:
-            # rectify camera_capt
-            # rectified -> mapper
-            # rectified -> model
-            predict_list = model.predict_from_opencv(img)
-            # decide play
-            pieces_list = GameAI.detection_to_gamepieces(
-                predict_list,
-                game_instance,
+        try:
+            # go to upperview
+            game_instance: Checkers = get_game_instance()
+            if game_instance is None:
+                return jsonify(GAME_NOT_STARTED), 404
+            robotcontroller.to_upperboard()
+            img = None
+            count = 0
+            cam_idx = 0
+            capture_module = CaptureModule(cam_idx)
+            camera_capt = True
+            while img is None:
+                img = capture_module.capture_opencv()
+                count += 1
+                if count >= 2:
+                    camera_capt = False
+                    capture_module.video_capture.release()
+                    return jsonify({'Error', 'Could not capture a picture'}), 500
+            capture_module.video_capture.release()
+            # detect board, update board
+            if camera_capt is True:
+                # rectify camera_capt
+                # rectified -> mapper
+                # rectified -> model
+                predict_list = model.predict_from_opencv(img)
+                # decide play
+                pieces_list = GameAI.detection_to_gamepieces(
+                    predict_list,
+                    game_instance,
+                )
+                game_instance.overwrite_board(pieces_list)
+            # play
+            gameai = GameAI(
+                robot=game_instance.robot_color,
+                adv=game_instance.human_color,
             )
-            game_instance.overwrite_board(pieces_list)
-        # play
-        gameai = GameAI(
-            robot=game_instance.robot_color,
-            adv=game_instance.human_color,
-        )
-        next_play = gameai.evaluate_moves(game_instance)
-        print(next_play)
-        playres = __make_move(next_play)
-        protogame = __getprotoboard()
-        status = 0
-        if playres is True:
-            status = 200
-        else:
-            status = 500
-        res = Response(bytes(protogame), status=status)
-        return res
+            next_play = gameai.evaluate_moves(game_instance)
+            print(next_play)
+            playres = __make_move(next_play)
+            protogame = __getprotoboard()
+            status = 0
+            if playres is True:
+                status = 200
+            else:
+                status = 500
+            res = Response(bytes(protogame), status=status)
+            return res
+        except Exception as e:
+            print(e)
 
     @game_controller.route('/check_winner', methods=['GET'])
     def check_winner():

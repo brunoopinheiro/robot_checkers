@@ -39,7 +39,7 @@ class KinovaRobot(IRobot):
 
     @check_connection
     def disconnect(self) -> None:
-        self.kinova.safe_disconnect()
+        # self.kinova.safe_disconnect()
         super().disconnect()
         if self.connected is False:
             print('Conexão Finalizada com Sucesso')
