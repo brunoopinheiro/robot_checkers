@@ -136,13 +136,17 @@ def construct_game_blueprint(
                 # rectify camera_capt
                 # rectified -> mapper
                 # rectified -> model
-                predict_list = model.predict_from_opencv(img)
-                # decide play
-                pieces_list = GameAI.detection_to_gamepieces(
-                    predict_list,
-                    game_instance,
-                )
-                game_instance.overwrite_board(pieces_list)
+                try:
+                    predict_list = model.predict_from_opencv(img)
+                    # decide play
+                    pieces_list = GameAI.detection_to_gamepieces(
+                        predict_list,
+                        game_instance,
+                    )
+                    game_instance.overwrite_board(pieces_list)
+                except Exception as e:
+                    print(e)
+                    print('Coudnt detect')
             # play
             gameai = GameAI(
                 robot=game_instance.robot_color,
@@ -161,6 +165,7 @@ def construct_game_blueprint(
             return res
         except Exception as e:
             print(e)
+            return jsonify({'error': f'{e}'}), 500
 
     @game_controller.route('/check_winner', methods=['GET'])
     def check_winner():
